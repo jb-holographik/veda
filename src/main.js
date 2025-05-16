@@ -1,3 +1,3 @@
 import './styles/style.css'
 
-console.log('Working!')
+console.log('Dist Working!')
