@@ -1,0 +1,42 @@
+name: Deploy dist to release branch
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build with Vite
+        run: yarn build
+
+      - name: Deploy dist to release branch
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Copy dist contents to a temp dir
+          mkdir ../release-temp
+          cp -r dist/* ../release-temp/
+          cd ../release-temp
+
+          # Init new Git repo for release
+          git init
+          git checkout -b release
+          git add .
+          git commit -m "Deploy build to release branch"
+          git push --force "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" release

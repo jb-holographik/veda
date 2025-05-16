@@ -11,6 +11,9 @@ export default defineConfig({
       host: 'localhost',
       protocol: 'ws',
     },
+    headers: {
+      'Permissions-Policy': 'browsing-topics=()'
+    }
   },
   build: {
     minify: true,
