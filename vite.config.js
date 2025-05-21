@@ -3,7 +3,13 @@ import eslintPlugin from 'vite-plugin-eslint'
 
 // vite.config.js
 export default defineConfig({
-  plugins: [eslintPlugin({ cache: false })],
+  plugins: [
+    eslintPlugin({
+      cache: false,
+      exclude: ['**/webflow.css', '**/*.css'],
+      include: ['src/**/*.js', 'src/**/*.jsx', 'src/**/*.ts', 'src/**/*.tsx']
+    })
+  ],
   server: {
     host: 'localhost',
     cors: '*',

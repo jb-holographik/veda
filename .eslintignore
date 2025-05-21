@@ -8,3 +8,6 @@ coverage
 example
 vite.config.js
 README.md
+
+**/webflow.css
+**/*.css

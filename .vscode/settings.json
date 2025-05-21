@@ -4,5 +4,24 @@
   "editor.codeActionsOnSave": {
     "source.fixAll": "explicit"
   },
-  "eslint.validate": ["javascript"]
+  "eslint.validate": [
+    "javascript"
+  ],
+  "css.validate": true,
+  "css.lint.validProperties": [
+    "speak",
+    "tap-highlight-color",
+    "-webkit-tap-highlight-color",
+    "-webkit-transform",
+    "-webkit-appearance",
+    "-moz-appearance",
+    "-webkit-user-select",
+    "-moz-user-select",
+    "font-smoothing",
+    "-webkit-font-smoothing",
+    "-moz-osx-font-smoothing"
+  ],
+  "files.associations": {
+    "**/weblow.css": "plaintext"
+  }
 }
