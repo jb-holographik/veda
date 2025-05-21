@@ -54,3 +54,7 @@
   align-items: center;
   justify-content: center;
 }
+
+.announcement-bar {
+  background: #000 !important;
+}
