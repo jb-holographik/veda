@@ -9,22 +9,13 @@ gsap.registerPlugin(ScrollTrigger)
 // Créer les références aux sliders
 let leftSlider, rightSlider
 
-// Détecter si le navigateur est Firefox
-const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1
-
 // Fonction pour gérer les médias (vidéos et Lottie)
 function handleMedia(slide, isActive) {
   // Gestion des vidéos
   const video = slide.querySelector('video')
   if (video) {
     if (isActive) {
-      video.play().catch((err) => {
-        console.warn('Erreur lecture vidéo :', err)
-        // Si on est sur Firefox et que la lecture échoue, remplacer par une image
-        if (isFirefox && video.style.display !== 'none') {
-          tryReplaceVideoWithImage(video)
-        }
-      })
+      video.play().catch((err) => console.warn('Erreur lecture vidéo :', err))
     } else {
       video.pause()
       video.currentTime = 0
@@ -59,37 +50,44 @@ function handleMedia(slide, isActive) {
   }
 }
 
-// Remplacer une vidéo qui ne fonctionne pas par une image
-function tryReplaceVideoWithImage(video) {
-  // Masquer la vidéo problématique
-  video.style.display = 'none'
+// Fonction pour ajouter des sources MP4 alternatives aux vidéos WebM
+function addFallbackVideoSources() {
+  document
+    .querySelectorAll('.hero-animation video, .hero-animation-2 video')
+    .forEach((video) => {
+      // Si la vidéo a déjà une source alternative, on ne fait rien
+      if (video.querySelector('source')) return
 
-  // Créer une image de remplacement
-  const img = document.createElement('img')
+      const originalSrc = video.getAttribute('src')
+      if (!originalSrc) return
 
-  // Essayer différentes stratégies pour trouver une image
-  if (video.poster) {
-    img.src = video.poster
-  } else if (video.querySelector('source')) {
-    const sourceUrl = video.querySelector('source').src
-    img.src = sourceUrl
-      .replace(/\.(webm|mp4)(\?.*)?$/, '.jpg$2')
-      .replace('/video/', '/image/')
-  } else {
-    // Image placeholder en cas d'échec
-    img.src =
-      'data:image/svg+xml;charset=utf-8,%3Csvg xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22 viewBox%3D%220 0 1 1%22%3E%3C%2Fsvg%3E'
-  }
+      // Créer la structure source pour WebM et MP4
+      video.removeAttribute('src')
 
-  // Appliquer des styles pour que l'image ressemble à la vidéo
-  img.alt = 'Media content'
-  img.style.width = '100%'
-  img.style.height = '100%'
-  img.style.objectFit = 'cover'
-  img.style.position = video.style.position || 'relative'
+      // Source WebM (originale)
+      const sourceWebm = document.createElement('source')
+      sourceWebm.setAttribute('src', originalSrc)
+      sourceWebm.setAttribute('type', 'video/webm')
 
-  // Ajouter l'image juste après la vidéo
-  video.parentNode.insertBefore(img, video.nextSibling)
+      // Source MP4 (alternative) - convertir l'URL de WebM à MP4
+      const mp4Src = originalSrc.replace('.webm', '.mp4')
+      const sourceMp4 = document.createElement('source')
+      sourceMp4.setAttribute('src', mp4Src)
+      sourceMp4.setAttribute('type', 'video/mp4')
+
+      // Ajouter les sources à la vidéo
+      video.appendChild(sourceWebm)
+      video.appendChild(sourceMp4)
+
+      // Gérer les erreurs de chargement
+      video.addEventListener(
+        'error',
+        function (e) {
+          console.warn('Erreur de chargement vidéo:', e)
+        },
+        true
+      )
+    })
 }
 
 // Désactiver l'autoplay des Lottie dans les hero-animation
@@ -106,7 +104,6 @@ function disableAllLottieAutoplay() {
       lottie.setAttribute('data-is-ix2-target', '0')
       lottie.setAttribute('data-autoplay-on-scroll', '0')
 
-      // Si Webflow est disponible, arrêter l'animation
       if (window.Webflow && window.Webflow.require) {
         const lottieInstance = window.Webflow.require('lottie')
           .lottie.getRegisteredAnimations()
@@ -124,8 +121,11 @@ function disableAllLottieAutoplay() {
 // Attendre que Webflow soit chargé
 window.Webflow = window.Webflow || []
 window.Webflow.push(() => {
-  // Désactiver l'autoplay des Lottie dans les hero-animation
+  // Désactiver l'autoplay de tous les Lottie immédiatement
   disableAllLottieAutoplay()
+
+  // Ajouter des sources MP4 alternatives aux vidéos WebM
+  addFallbackVideoSources()
 
   // hero left row
   leftSlider = new Swiper('.hero-animation', {
