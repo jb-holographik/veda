@@ -20,7 +20,7 @@ window.addEventListener('load', () => {
         slidesPerView: 1,
       },
       992: {
-        slidesPerView: 1,
+        slidesPerView: 3,
       },
     },
     on: {
