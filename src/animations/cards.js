@@ -1,6 +1,6 @@
 import Swiper from 'swiper'
 import 'swiper/css'
-
+console.log('✅ VEDA version 0.3.8')
 window.addEventListener('load', () => {
   const container = document.querySelector('.cards-slider')
 
