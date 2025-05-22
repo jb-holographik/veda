@@ -11,6 +11,18 @@ window.addEventListener('load', () => {
       nextEl: container.querySelector('.swiper-button-next'),
       prevEl: container.querySelector('.swiper-button-prev'),
     },
+    breakpoints: {
+      320: {
+        slidesPerView: 1,
+        spaceBetween: 16,
+      },
+      768: {
+        slidesPerView: 1,
+      },
+      992: {
+        slidesPerView: 1,
+      },
+    },
     on: {
       slideChange: () => {
         setTimeout(setEqualCardHeights, 100)

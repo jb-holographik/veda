@@ -130,8 +130,6 @@ window.Webflow.push(() => {
   // hero left row
   leftSlider = new Swiper('.hero-animation', {
     modules: [Autoplay],
-    direction: 'vertical',
-    effect: 'slide',
     slidesPerView: 3,
     loop: true,
     centeredSlides: true,
@@ -140,6 +138,23 @@ window.Webflow.push(() => {
       delay: 4000,
       reverseDirection: true,
       disableOnInteraction: false,
+    },
+    breakpoints: {
+      320: {
+        direction: 'horizontal',
+        slidesPerView: 2.5,
+        spaceBetween: 16,
+      },
+      768: {
+        direction: 'horizontal',
+        slidesPerView: 4,
+        centeredSlides: false,
+        initialSlide: 2,
+      },
+      992: {
+        direction: 'vertical',
+        slidesPerView: 3,
+      },
     },
     on: {
       beforeInit() {
@@ -176,13 +191,28 @@ window.Webflow.push(() => {
   // hero right row
   rightSlider = new Swiper('.hero-animation-2', {
     modules: [Autoplay],
-    direction: 'vertical',
-    effect: 'slide',
     slidesPerView: 3,
     loop: true,
     centeredSlides: true,
     spaceBetween: 32,
     autoplay: false, // Désactiver l'autoplay car il sera contrôlé par le slider gauche
+    breakpoints: {
+      320: {
+        direction: 'horizontal',
+        slidesPerView: 2.5,
+        spaceBetween: 16,
+      },
+      768: {
+        direction: 'horizontal',
+        slidesPerView: 4,
+        centeredSlides: false,
+        initialSlide: 2,
+      },
+      992: {
+        direction: 'vertical',
+        slidesPerView: 3,
+      },
+    },
     on: {
       init(swiper) {
         updatePrevSlideOpacity(swiper)
@@ -237,12 +267,99 @@ function updatePrevSlideOpacity(swiper) {
   })
 }
 
-// Gestionnaire de redimensionnement
+// Gestionnaire de redimensionnement avec debounce
+let resizeTimeout
 window.addEventListener('resize', () => {
-  if (leftSlider && rightSlider) {
-    leftSlider.update()
-    rightSlider.update()
-  }
+  clearTimeout(resizeTimeout)
+  resizeTimeout = setTimeout(() => {
+    if (leftSlider && rightSlider) {
+      // Détruire et recréer les instances pour une réinitialisation complète
+      leftSlider.destroy(true, true)
+      rightSlider.destroy(true, true)
+
+      // Réinitialiser les sliders
+      leftSlider = new Swiper('.hero-animation', {
+        modules: [Autoplay],
+        slidesPerView: 3,
+        loop: true,
+        centeredSlides: true,
+        spaceBetween: 32,
+        autoplay: {
+          delay: 4000,
+          reverseDirection: true,
+          disableOnInteraction: false,
+        },
+        breakpoints: {
+          320: {
+            direction: 'horizontal',
+            slidesPerView: 2.5,
+            spaceBetween: 16,
+          },
+          768: {
+            direction: 'horizontal',
+            slidesPerView: 4,
+            centeredSlides: false,
+            initialSlide: 2,
+          },
+          992: {
+            direction: 'vertical',
+            slidesPerView: 3,
+          },
+        },
+        on: {
+          init(swiper) {
+            updateSlideOpacity(swiper)
+          },
+          slideChangeTransitionStart(swiper) {
+            updateSlideOpacity(swiper)
+            if (rightSlider && !rightSlider.animating) {
+              rightSlider.slideNext()
+            }
+          },
+          slideChangeTransitionEnd(swiper) {
+            swiper.slides.forEach((slide) => {
+              const isActive = slide.classList.contains('swiper-slide-active')
+              handleMedia(slide, isActive)
+            })
+          },
+        },
+      })
+
+      rightSlider = new Swiper('.hero-animation-2', {
+        modules: [Autoplay],
+        slidesPerView: 3,
+        loop: true,
+        centeredSlides: true,
+        spaceBetween: 32,
+        autoplay: false,
+        breakpoints: {
+          320: {
+            direction: 'horizontal',
+            slidesPerView: 2.5,
+            spaceBetween: 16,
+          },
+          768: {
+            direction: 'horizontal',
+            slidesPerView: 4,
+            centeredSlides: false,
+            initialSlide: 2,
+          },
+          992: {
+            direction: 'vertical',
+            slidesPerView: 3,
+          },
+        },
+        on: {
+          init(swiper) {
+            updatePrevSlideOpacity(swiper)
+          },
+          slideChangeTransitionStart(swiper) {
+            updatePrevSlideOpacity(swiper)
+          },
+        },
+      })
+    }
+  }, 300) // Délai de 300ms pour éviter trop d'appels pendant le redimensionnement
 })
 
 function initMarqueeScrollDirection() {

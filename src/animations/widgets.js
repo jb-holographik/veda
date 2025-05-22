@@ -41,13 +41,24 @@ function updateTextsOpacity(activeIndex) {
   })
 }
 
-// Attendre que le DOM soit complètement chargé
-document.addEventListener('DOMContentLoaded', () => {
+// Fonction pour mettre à jour la hauteur du container
+function updateContainerHeight() {
+  if (!container || !texts.length) return
+
   // Calculer la hauteur d'un seul widgets_text
   const singleTextHeight = texts[0].offsetHeight
 
   // Appliquer la hauteur totale au container (4x la hauteur d'un texte)
   container.style.height = `${singleTextHeight * 4}px`
+
+  // Forcer un refresh de ScrollTrigger
+  ScrollTrigger.refresh()
+}
+
+// Attendre que le DOM soit complètement chargé
+document.addEventListener('DOMContentLoaded', () => {
+  // Initialiser la hauteur du container
+  updateContainerHeight()
 
   // Reset de la position initiale
   gsap.set(container, {
@@ -73,6 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
       else if (progress >= 0.25) activeIndex = 1
 
       // Calculer le déplacement vertical
+      const singleTextHeight = texts[0].offsetHeight
       const yOffset = -singleTextHeight * activeIndex
 
       // Animer le container de textes
@@ -86,4 +98,13 @@ document.addEventListener('DOMContentLoaded', () => {
       updateTextsOpacity(activeIndex)
     },
   })
+})
+
+// Gestionnaire de redimensionnement avec debounce
+let resizeTimeout
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimeout)
+  resizeTimeout = setTimeout(() => {
+    updateContainerHeight()
+  }, 200)
 })

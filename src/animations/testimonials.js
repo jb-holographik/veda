@@ -5,6 +5,9 @@ import 'swiper/css'
 // Activer les modules Swiper nécessaires
 Swiper.use([Thumbs])
 
+// Variables globales pour accéder aux instances de Swiper
+let mainSwiper, controlsSwiper
+
 window.addEventListener('load', () => {
   initTestimonialSliders()
 })
@@ -18,7 +21,7 @@ function initTestimonialSliders() {
     return
   }
 
-  const controlsSwiper = new Swiper(controlsSlider, {
+  controlsSwiper = new Swiper(controlsSlider, {
     slidesPerView: 'auto',
     spaceBetween: 16,
     allowTouchMove: false,
@@ -26,7 +29,7 @@ function initTestimonialSliders() {
     slideToClickedSlide: false,
   })
 
-  const mainSwiper = new Swiper(mainSlider, {
+  mainSwiper = new Swiper(mainSlider, {
     slidesPerView: 1.5,
     centeredSlides: true,
     loop: true,
@@ -35,8 +38,12 @@ function initTestimonialSliders() {
     observer: true,
     observeParents: true,
     on: {
-      init: () => setEqualTestimonialsHeights(),
+      init: () => {
+        // S'assurer que les hauteurs sont égales dès l'initialisation
+        setTimeout(setEqualTestimonialsHeights, 100)
+      },
       slideChange: function () {
+        // Mettre à jour les hauteurs après un changement de slide
         setTimeout(setEqualTestimonialsHeights, 100)
 
         const index = this.realIndex % 3
@@ -45,6 +52,10 @@ function initTestimonialSliders() {
         controlSlides.forEach((slide, i) => {
           slide.classList.toggle('is-active', i === index)
         })
+      },
+      resize: function () {
+        // S'assurer que la hauteur est mise à jour quand Swiper détecte un redimensionnement
+        setTimeout(setEqualTestimonialsHeights, 100)
       },
     },
   })
@@ -57,19 +68,44 @@ function initTestimonialSliders() {
   })
 }
 
+// Fonction pour égaliser les hauteurs des cartes témoignages
 function setEqualTestimonialsHeights() {
   const cards = document.querySelectorAll('.swiper-slide.testimonial')
   if (!cards.length) return
 
-  let maxHeight = 0
+  // Réinitialiser d'abord toutes les hauteurs à auto
   cards.forEach((card) => {
     card.style.height = 'auto'
+  })
+
+  // Calculer la hauteur maximale
+  let maxHeight = 0
+  cards.forEach((card) => {
     maxHeight = Math.max(maxHeight, card.offsetHeight)
   })
 
-  cards.forEach((card) => {
-    card.style.height = `${maxHeight}px`
-  })
+  // Appliquer la hauteur maximale à toutes les cartes
+  if (maxHeight > 0) {
+    cards.forEach((card) => {
+      card.style.height = `${maxHeight}px`
+    })
+  }
+
+  // Mettre à jour Swiper si l'instance existe
+  if (mainSwiper) {
+    mainSwiper.update()
+  }
 }
 
-window.addEventListener('resize', setEqualTestimonialsHeights)
+// Gestionnaire de redimensionnement avec debounce pour optimiser les performances
+let resizeTimeout
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimeout)
+  resizeTimeout = setTimeout(() => {
+    setEqualTestimonialsHeights()
+
+    // Mettre à jour les instances Swiper si elles existent
+    if (mainSwiper) mainSwiper.update()
+    if (controlsSwiper) controlsSwiper.update()
+  }, 200)
+})

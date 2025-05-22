@@ -1,4 +1,4 @@
-<!DOCTYPE html><!--  Last Published: Wed May 21 2025 09:54:17 GMT+0000 (Coordinated Universal Time)  -->
+<!DOCTYPE html><!--  Last Published: Thu May 22 2025 12:23:56 GMT+0000 (Coordinated Universal Time)  -->
 <html data-wf-page="68271570945b21be587338e0" data-wf-site="68271570945b21be587338d0">
 
 <head>
@@ -10,8 +10,8 @@
   <link href="css/veda-staging.webflow.css" rel="stylesheet" type="text/css">
   <script
     type="text/javascript">!function (o, c) { var n = c.documentElement, t = " w-mod-"; n.className += t + "js", ("ontouchstart" in o || o.DocumentTouch && c instanceof DocumentTouch) && (n.className += t + "touch") }(window, document);</script>
-  <link href="images/favicon.ico" rel="shortcut icon" type="image/x-icon">
-  <link href="images/webclip.png" rel="apple-touch-icon">
+  <link href="images/favicon.svg" rel="shortcut icon" type="image/x-icon">
+  <link href="images/webclip.svg" rel="apple-touch-icon">
 </head>
 
 <body>
@@ -158,6 +158,11 @@
       .swiper-button-next:hover {
         color: black;
       }
+
+      .video-wrap {
+        height: 100%;
+        width: 100%;
+      }
     </style>
   </div>
   <header class="section_hero">
@@ -165,12 +170,13 @@
       <a href="#" class="announcement-link">Read our Round A Funding Announcement →</a>
     </aside>
     <div class="w-layout-vflex hero">
-      <nav class="navbar"><svg xmlns="http://www.w3.org/2000/svg" width="100%" viewbox="0 0 42 39" fill="none"
-          class="veda_logo">
-          <path fill-rule="evenodd" clip-rule="evenodd"
-            d="M11.1515 33.3728C15.5382 40.8758 26.4619 40.8757 30.8486 33.3728L40.4469 16.9559C44.848 9.42818 39.3718 2.42524e-06 30.5983 1.66451e-06L11.4017 0C2.6282 -7.60732e-07 -2.84803 9.42815 1.55311 16.9558L11.1515 33.3728ZM21 11.5887C21 6.66542 25.024 2.67432 29.9878 2.67432C34.9517 2.67432 38.9757 6.66542 38.9757 11.5887C38.9757 16.512 34.9517 20.5031 29.9878 20.5031C25.024 20.5031 21 16.512 21 11.5887Z"
-            fill="currentColor"></path>
-        </svg>
+      <nav class="navbar">
+        <a aria-label="home" href="index.html" aria-current="page" class="nav-link w-inline-block w--current"><svg
+            xmlns="http://www.w3.org/2000/svg" width="100%" viewbox="0 0 42 39" fill="none" class="veda_logo">
+            <path fill-rule="evenodd" clip-rule="evenodd"
+              d="M11.1515 33.3728C15.5382 40.8758 26.4619 40.8757 30.8486 33.3728L40.4469 16.9559C44.848 9.42818 39.3718 2.42524e-06 30.5983 1.66451e-06L11.4017 0C2.6282 -7.60732e-07 -2.84803 9.42815 1.55311 16.9558L11.1515 33.3728ZM21 11.5887C21 6.66542 25.024 2.67432 29.9878 2.67432C34.9517 2.67432 38.9757 6.66542 38.9757 11.5887C38.9757 16.512 34.9517 20.5031 29.9878 20.5031C25.024 20.5031 21 16.512 21 11.5887Z"
+              fill="currentColor"></path>
+          </svg></a>
         <div class="navbar_content">
           <div class="navbar-links">
             <a rel="noopener noreferrer" target="_blank" href="#" class="nav-link">Docs</a>
@@ -184,7 +190,7 @@
           <h1 class="hero-heading">The DeFi Engine for<span class="highlight-wrapper"><span
                 class="highlight is-active">Asset Managers</span><span class="highlight">Financial Apps</span><span
                 class="highlight">Custodians</span><span class="highlight">Fintech</span></span></h1>
-          <p class="paragraph-2">Lorem ipsum dolor sit amet consectetur in turpis <br>vulputate habitasse vitae.</p>
+          <p class="hero-p">Lorem ipsum dolor sit amet consectetur in turpis <br>vulputate habitasse vitae.</p>
           <div class="ctas">
             <a rel="noopener noreferrer" target="_blank" href="#" class="cta">Explore vaults</a>
             <a rel="noopener noreferrer" target="_blank" href="#" class="cta is-secondary">Speak with us</a>
@@ -197,67 +203,128 @@
               <div class="animation-row swiper-wrapper">
                 <div class="is-slide swiper-slide">
                   <div class="coin-block">
-                    <div class="video-wrapper w-embed"><video preload="auto" class="swiper-video" muted=""
-                        playsinline="" src="https://res.cloudinary.com/dmuzslwtb/video/upload/v1747640404/coin2_wtyuda.webm
-"></video></div>
+                    <div class="video-wrapper w-embed">
+                      <div class="video-wrap" data-poster-url=""
+                        data-video-urls="https://cdn.jsdelivr.net/gh/jb-holographik/veda@release/videos/coin-2.mp4"
+                        data-autoplay="false" data-loop="false" data-wf-ignore="true"
+                        style="width: 100%; height: 100%;">
+                        <video class="swiper-video" muted="" style="background-image: url('');" playsinline=""
+                          data-wf-ignore="true" data-object-fit="cover" poster="" preload="metadata">
+                          <source src="https://cdn.jsdelivr.net/gh/jb-holographik/veda@release/videos/coin-2.mp4"
+                            type="video/mp4">
+                          <source src="" type="video/webm">
+                        </video>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div class="is-slide swiper-slide">
                   <div class="coin-block">
-                    <div class="is-coin" data-w-id="f0ac5942-733a-44cb-8118-ff4ea5dea1f0" data-animation-type="lottie"
-                      data-src="documents/Lottie-Icon-3.json" data-loop="0" data-direction="1" data-autoplay="1"
-                      data-is-ix2-target="0" data-renderer="svg" data-default-duration="0"
+                    <div data-autoplay="1" class="is-coin" data-w-id="f0ac5942-733a-44cb-8118-ff4ea5dea1f0"
+                      data-animation-type="lottie" data-src="documents/Lottie-Icon-3.json" data-loop="0"
+                      data-direction="1" data-is-ix2-target="0" data-renderer="svg" data-default-duration="0"
                       data-duration="6.033333333333333"></div>
                   </div>
                 </div>
                 <div class="is-slide swiper-slide">
                   <div class="coin-block">
-                    <div class="video-wrapper w-embed"><video preload="auto" class="swiper-video" muted=""
-                        playsinline="" src="https://res.cloudinary.com/dmuzslwtb/video/upload/v1747819419/Coin06_j5bk5y.webm
-"></video></div>
+                    <div class="video-wrapper w-embed">
+                      <div class="video-wrap" data-poster-url=""
+                        data-video-urls="https://cdn.jsdelivr.net/gh/jb-holographik/veda@release/videos/coin-6.mp4"
+                        data-autoplay="false" data-loop="false" data-wf-ignore="true"
+                        style="width: 100%; height: 100%;">
+                        <video class="swiper-video" muted="" style="background-image: url('');" playsinline=""
+                          data-wf-ignore="true" data-object-fit="cover" poster="" preload="metadata">
+                          <source src="https://cdn.jsdelivr.net/gh/jb-holographik/veda@release/videos/coin-6.mp4"
+                            type="video/mp4">
+                          <source src="" type="video/webm">
+                        </video>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div class="is-slide swiper-slide">
                   <div class="coin-block">
-                    <div class="video-wrapper w-embed"><video preload="auto" class="swiper-video" muted=""
-                        playsinline="" src="https://res.cloudinary.com/dmuzslwtb/video/upload/v1747819416/Coin5_ridcj1.webm
-"></video></div>
+                    <div class="video-wrapper w-embed">
+                      <div class="video-wrap" data-poster-url=""
+                        data-video-urls="https://cdn.jsdelivr.net/gh/jb-holographik/veda@release/videos/Coin-5.mp4"
+                        data-autoplay="false" data-loop="false" data-wf-ignore="true"
+                        style="width: 100%; height: 100%;">
+                        <video class="swiper-video" muted="" style="background-image: url('');" playsinline=""
+                          data-wf-ignore="true" data-object-fit="cover" poster="" preload="metadata">
+                          <source src="https://cdn.jsdelivr.net/gh/jb-holographik/veda@release/videos/Coin-5.mp4"
+                            type="video/mp4">
+                          <source src="" type="video/webm">
+                        </video>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div class="is-slide swiper-slide">
                   <div class="coin-block">
-                    <div class="is-coin" data-w-id="7b7a6129-479b-c341-0d10-875af04d4170" data-animation-type="lottie"
-                      data-src="documents/Lottie-Icon-2.json" data-loop="0" data-direction="1" data-autoplay="1"
-                      data-is-ix2-target="0" data-renderer="svg" data-default-duration="0" data-duration="6"></div>
+                    <div data-autoplay="1" class="is-coin" data-w-id="7b7a6129-479b-c341-0d10-875af04d4170"
+                      data-animation-type="lottie" data-src="documents/Lottie-Icon-2.json" data-loop="0"
+                      data-direction="1" data-is-ix2-target="0" data-renderer="svg" data-default-duration="0"
+                      data-duration="6"></div>
                   </div>
                 </div>
                 <div class="is-slide swiper-slide">
                   <div class="coin-block">
-                    <div class="video-wrapper w-embed"><video preload="auto" class="swiper-video" muted=""
-                        playsinline="" src="https://res.cloudinary.com/dmuzslwtb/video/upload/v1747820429/Coin4_ix3zhc.webm
-"></video></div>
+                    <div class="video-wrapper w-embed">
+                      <div class="video-wrap" data-poster-url=""
+                        data-video-urls="https://cdn.jsdelivr.net/gh/jb-holographik/veda@release/videos/Coin-4.mp4"
+                        data-autoplay="false" data-loop="false" data-wf-ignore="true"
+                        style="width: 100%; height: 100%;">
+                        <video class="swiper-video" muted="" style="background-image: url('');" playsinline=""
+                          data-wf-ignore="true" data-object-fit="cover" poster="" preload="metadata">
+                          <source src="https://cdn.jsdelivr.net/gh/jb-holographik/veda@release/videos/Coin-4.mp4"
+                            type="video/mp4">
+                          <source src="" type="video/webm">
+                        </video>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div class="is-slide swiper-slide">
                   <div class="coin-block">
-                    <div class="video-wrapper w-embed"><video preload="auto" class="swiper-video" muted=""
-                        playsinline="" src="https://res.cloudinary.com/dmuzslwtb/video/upload/v1747819586/Coin3_ippdbj.webm
-"></video></div>
+                    <div class="video-wrapper w-embed">
+                      <div class="video-wrap" data-poster-url=""
+                        data-video-urls="https://cdn.jsdelivr.net/gh/jb-holographik/veda@release/videos/coin-3.mp4"
+                        data-autoplay="false" data-loop="false" data-wf-ignore="true"
+                        style="width: 100%; height: 100%;">
+                        <video class="swiper-video" muted="" style="background-image: url('');" playsinline=""
+                          data-wf-ignore="true" data-object-fit="cover" poster="" preload="metadata">
+                          <source src="https://cdn.jsdelivr.net/gh/jb-holographik/veda@release/videos/coin-3.mp4"
+                            type="video/mp4">
+                          <source src="" type="video/webm">
+                        </video>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div class="is-slide swiper-slide">
                   <div class="coin-block">
-                    <div class="is-coin" data-w-id="3d0e1b78-7e0f-718d-b125-3b229adfe3cb" data-animation-type="lottie"
-                      data-src="documents/Lottie-Icon-1.json" data-loop="0" data-direction="1" data-autoplay="1"
-                      data-is-ix2-target="0" data-renderer="svg" data-default-duration="0"
+                    <div data-autoplay="1" class="is-coin" data-w-id="3d0e1b78-7e0f-718d-b125-3b229adfe3cb"
+                      data-animation-type="lottie" data-src="documents/Lottie-Icon-1.json" data-loop="0"
+                      data-direction="1" data-is-ix2-target="0" data-renderer="svg" data-default-duration="0"
                       data-duration="5.966666666666667"></div>
                   </div>
                 </div>
                 <div class="is-slide swiper-slide">
                   <div class="coin-block">
-                    <div class="video-wrapper w-embed"><video preload="auto" class="swiper-video" muted=""
-                        playsinline="" src="https://res.cloudinary.com/dmuzslwtb/video/upload/v1747640404/coin1_am4uju.webm
-"></video></div>
+                    <div class="video-wrapper w-embed">
+                      <div data-poster-url=""
+                        data-video-urls="https://cdn.jsdelivr.net/gh/jb-holographik/veda@release/videos/coin-1.mp4"
+                        data-autoplay="false" data-loop="false" data-wf-ignore="true" style="width: 100%; height: 100%;"
+                        class="w-background-video w-background-video-atom">
+                        <video class="swiper-video" muted="" style="background-image: url('');" playsinline=""
+                          data-wf-ignore="true" data-object-fit="cover" poster="" preload="metadata">
+                          <source src="https://cdn.jsdelivr.net/gh/jb-holographik/veda@release/videos/coin-1.mp4"
+                            type="video/mp4">
+                          <source src="" type="video/webm">
+                        </video>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -267,67 +334,128 @@
               <div class="animation-row swiper-wrapper">
                 <div class="is-slide swiper-slide">
                   <div class="coin-block">
-                    <div class="is-coin" data-w-id="90560dd6-b498-9907-6aa1-179e71029e59" data-animation-type="lottie"
-                      data-src="documents/Lottie-Icon-1.json" data-loop="0" data-direction="1" data-autoplay="1"
-                      data-is-ix2-target="0" data-renderer="svg" data-default-duration="0"
+                    <div data-autoplay="1" class="is-coin" data-w-id="90560dd6-b498-9907-6aa1-179e71029e59"
+                      data-animation-type="lottie" data-src="documents/Lottie-Icon-1.json" data-loop="0"
+                      data-direction="1" data-is-ix2-target="0" data-renderer="svg" data-default-duration="0"
                       data-duration="5.966666666666667"></div>
                   </div>
                 </div>
                 <div class="is-slide swiper-slide">
                   <div class="coin-block">
-                    <div class="video-wrapper w-embed"><video preload="auto" class="swiper-video" muted=""
-                        playsinline="" src="https://res.cloudinary.com/dmuzslwtb/video/upload/v1747819586/Coin3_ippdbj.webm
-"></video></div>
+                    <div class="video-wrapper w-embed">
+                      <div class="video-wrap" data-poster-url=""
+                        data-video-urls="https://cdn.jsdelivr.net/gh/jb-holographik/veda@release/videos/coin-3.mp4"
+                        data-autoplay="false" data-loop="false" data-wf-ignore="true"
+                        style="width: 100%; height: 100%;">
+                        <video class="swiper-video" muted="" style="background-image: url('');" playsinline=""
+                          data-wf-ignore="true" data-object-fit="cover" poster="" preload="metadata">
+                          <source src="https://cdn.jsdelivr.net/gh/jb-holographik/veda@release/videos/coin-3.mp4"
+                            type="video/mp4">
+                          <source src="" type="video/webm">
+                        </video>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div class="is-slide swiper-slide">
                   <div class="coin-block">
-                    <div class="video-wrapper w-embed"><video preload="auto" class="swiper-video" muted=""
-                        playsinline="" src="https://res.cloudinary.com/dmuzslwtb/video/upload/v1747820429/Coin4_ix3zhc.webm
-"></video></div>
+                    <div class="video-wrapper w-embed">
+                      <div class="video-wrap" data-poster-url=""
+                        data-video-urls="https://cdn.jsdelivr.net/gh/jb-holographik/veda@release/videos/Coin-4.mp4"
+                        data-autoplay="false" data-loop="false" data-wf-ignore="true"
+                        style="width: 100%; height: 100%;">
+                        <video class="swiper-video" muted="" style="background-image: url('');" playsinline=""
+                          data-wf-ignore="true" data-object-fit="cover" poster="" preload="metadata">
+                          <source src="https://cdn.jsdelivr.net/gh/jb-holographik/veda@release/videos/Coin-4.mp4"
+                            type="video/mp4">
+                          <source src="" type="video/webm">
+                        </video>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div class="is-slide swiper-slide">
                   <div class="coin-block">
-                    <div class="is-coin" data-w-id="90560dd6-b498-9907-6aa1-179e71029e50" data-animation-type="lottie"
-                      data-src="documents/Lottie-Icon-2.json" data-loop="0" data-direction="1" data-autoplay="1"
-                      data-is-ix2-target="0" data-renderer="svg" data-default-duration="0" data-duration="6"></div>
+                    <div data-autoplay="1" class="is-coin" data-w-id="90560dd6-b498-9907-6aa1-179e71029e50"
+                      data-animation-type="lottie" data-src="documents/Lottie-Icon-2.json" data-loop="0"
+                      data-direction="1" data-is-ix2-target="0" data-renderer="svg" data-default-duration="0"
+                      data-duration="6"></div>
                   </div>
                 </div>
                 <div class="is-slide swiper-slide">
                   <div class="coin-block">
-                    <div class="video-wrapper w-embed"><video preload="auto" class="swiper-video" muted=""
-                        playsinline="" src="https://res.cloudinary.com/dmuzslwtb/video/upload/v1747819416/Coin5_ridcj1.webm
-"></video></div>
+                    <div class="video-wrapper w-embed">
+                      <div class="video-wrap" data-poster-url=""
+                        data-video-urls="https://cdn.jsdelivr.net/gh/jb-holographik/veda@release/videos/Coin-5.mp4"
+                        data-autoplay="false" data-loop="false" data-wf-ignore="true"
+                        style="width: 100%; height: 100%;">
+                        <video class="swiper-video" muted="" style="background-image: url('');" playsinline=""
+                          data-wf-ignore="true" data-object-fit="cover" poster="" preload="metadata">
+                          <source src="https://cdn.jsdelivr.net/gh/jb-holographik/veda@release/videos/Coin-5.mp4"
+                            type="video/mp4">
+                          <source src="" type="video/webm">
+                        </video>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div class="is-slide swiper-slide">
                   <div class="coin-block">
-                    <div class="video-wrapper w-embed"><video preload="auto" class="swiper-video" muted=""
-                        playsinline="" src="https://res.cloudinary.com/dmuzslwtb/video/upload/v1747819419/Coin06_j5bk5y.webm
-"></video></div>
+                    <div class="video-wrapper w-embed">
+                      <div class="video-wrap" data-poster-url=""
+                        data-video-urls="https://cdn.jsdelivr.net/gh/jb-holographik/veda@release/videos/coin-6.mp4"
+                        data-autoplay="false" data-loop="false" data-wf-ignore="true"
+                        style="width: 100%; height: 100%;">
+                        <video class="swiper-video" muted="" style="background-image: url('');" playsinline=""
+                          data-wf-ignore="true" data-object-fit="cover" poster="" preload="metadata">
+                          <source src="https://cdn.jsdelivr.net/gh/jb-holographik/veda@release/videos/coin-6.mp4"
+                            type="video/mp4">
+                          <source src="" type="video/webm">
+                        </video>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div class="is-slide swiper-slide">
                   <div class="coin-block">
-                    <div class="is-coin" data-w-id="90560dd6-b498-9907-6aa1-179e71029e47" data-animation-type="lottie"
-                      data-src="documents/Lottie-Icon-3.json" data-loop="0" data-direction="1" data-autoplay="1"
-                      data-is-ix2-target="0" data-renderer="svg" data-default-duration="0"
+                    <div data-autoplay="1" class="is-coin" data-w-id="90560dd6-b498-9907-6aa1-179e71029e47"
+                      data-animation-type="lottie" data-src="documents/Lottie-Icon-3.json" data-loop="0"
+                      data-direction="1" data-is-ix2-target="0" data-renderer="svg" data-default-duration="0"
                       data-duration="6.033333333333333"></div>
                   </div>
                 </div>
                 <div class="is-slide swiper-slide">
                   <div class="coin-block">
-                    <div class="video-wrapper w-embed"><video preload="auto" class="swiper-video" muted=""
-                        playsinline="" src="https://res.cloudinary.com/dmuzslwtb/video/upload/v1747640404/coin2_wtyuda.webm
-"></video></div>
+                    <div class="video-wrapper w-embed">
+                      <div class="video-wrap" data-poster-url=""
+                        data-video-urls="https://cdn.jsdelivr.net/gh/jb-holographik/veda@release/videos/coin-2.mp4"
+                        data-autoplay="false" data-loop="false" data-wf-ignore="true"
+                        style="width: 100%; height: 100%;">
+                        <video class="swiper-video" muted="" style="background-image: url('');" playsinline=""
+                          data-wf-ignore="true" data-object-fit="cover" poster="" preload="metadata">
+                          <source src="https://cdn.jsdelivr.net/gh/jb-holographik/veda@release/videos/coin-2.mp4"
+                            type="video/mp4">
+                          <source src="" type="video/webm">
+                        </video>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div class="is-slide swiper-slide">
                   <div class="coin-block">
-                    <div class="video-wrapper w-embed"><video preload="auto" class="swiper-video" muted=""
-                        playsinline="" src="https://res.cloudinary.com/dmuzslwtb/video/upload/v1747640404/coin1_am4uju.webm
-"></video></div>
+                    <div class="video-wrapper w-embed">
+                      <div data-poster-url=""
+                        data-video-urls="https://cdn.jsdelivr.net/gh/jb-holographik/veda@release/videos/coin-1.mp4"
+                        data-autoplay="false" data-loop="false" data-wf-ignore="true" style="width: 100%; height: 100%;"
+                        class="w-background-video w-background-video-atom">
+                        <video class="swiper-video" muted="" style="background-image: url('');" playsinline=""
+                          data-wf-ignore="true" data-object-fit="cover" poster="" preload="metadata">
+                          <source src="https://cdn.jsdelivr.net/gh/jb-holographik/veda@release/videos/coin-1.mp4"
+                            type="video/mp4">
+                          <source src="" type="video/webm">
+                        </video>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -616,7 +744,7 @@
       </div>
       <div class="data_block">
         <div class="w-layout-hflex data-top"><span class="data-title">Depositors</span></div>
-        <div class="w-layout-hflex data-bottom"><span class="data-content">$3B</span></div>
+        <div class="w-layout-hflex data-bottom"><span class="data-content">100k+</span></div>
       </div>
       <div class="data_block">
         <div class="w-layout-hflex data-top"><span class="data-title">Yield Generated</span></div>
@@ -672,20 +800,22 @@
           data-src="documents/Veda---Widgets-03.json" data-loop="1" data-direction="1" data-autoplay="1"
           data-is-ix2-target="0" data-renderer="svg" data-default-duration="0" data-duration="4"></div>
       </div>
-      <div class="widgets-text-wrapper">
-        <div class="widgets-texts">
-          <div class="w-layout-hflex widgets_text"><span class="widget-text_title">Crypto Savings Accounts</span><span
-              class="widget-text_indicator">001</span></div>
-          <div class="w-layout-hflex widgets_text"><span class="widget-text_title">Ecosystem Vaults</span><span
-              class="widget-text_indicator">002</span></div>
-          <div class="w-layout-hflex widgets_text"><span class="widget-text_title">Defi Bluechip Index Fund</span><span
-              class="widget-text_indicator">003</span></div>
-          <div class="w-layout-hflex widgets_text"><span class="widget-text_title">Yield-Bearing Stablecoins</span><span
-              class="widget-text_indicator">004</span></div>
-          <div class="w-layout-hflex widgets_text"><span class="widget-text_title">Crypto Savings Accounts</span><span
-              class="widget-text_indicator">001</span></div>
-          <div class="w-layout-hflex widgets_text"><span class="widget-text_title">Ecosystem Vaults</span><span
-              class="widget-text_indicator">002</span></div>
+      <div class="widgets-wrap">
+        <div class="widgets-text-wrapper">
+          <div class="widgets-texts">
+            <div class="w-layout-hflex widgets_text"><span class="widget-text_title">Crypto Savings Accounts</span><span
+                class="widget-text_indicator">001</span></div>
+            <div class="w-layout-hflex widgets_text"><span class="widget-text_title">Ecosystem Vaults</span><span
+                class="widget-text_indicator">002</span></div>
+            <div class="w-layout-hflex widgets_text"><span class="widget-text_title">Defi Bluechip Index
+                Fund</span><span class="widget-text_indicator">003</span></div>
+            <div class="w-layout-hflex widgets_text"><span class="widget-text_title">Yield-Bearing
+                Stablecoins</span><span class="widget-text_indicator">004</span></div>
+            <div class="w-layout-hflex widgets_text"><span class="widget-text_title">Crypto Savings Accounts</span><span
+                class="widget-text_indicator">001</span></div>
+            <div class="w-layout-hflex widgets_text"><span class="widget-text_title">Ecosystem Vaults</span><span
+                class="widget-text_indicator">002</span></div>
+          </div>
         </div>
       </div>
     </div>
@@ -1279,55 +1409,36 @@
   </section>
   <section class="section_blog">
     <h2 class="is-white">Blog</h2>
-    <div class="blog_content">
-      <div class="blog_article">
-        <div class="article-img"><img src="images/card-image-02.webp" loading="lazy" alt="" class="article-img_img">
+    <div class="blog-wrapper">
+      <div class="blog-component w-dyn-list">
+        <div role="list" class="blog_content w-dyn-items">
+          <div role="listitem" class="blog_article w-dyn-item">
+            <div class="article-img"><img src="images/card-image-02.webp" loading="lazy" width="Auto" alt=""
+                class="article-img_img w-dyn-bind-empty"></div>
+            <div class="article-content">
+              <div class="article-content_top"><span class="article-content_title w-dyn-bind-empty"></span><span
+                  class="article-content_info w-dyn-bind-empty"></span></div>
+              <a href="#" class="article-content_link">→ Read More</a>
+            </div>
+          </div>
         </div>
-        <div class="article-content">
-          <div class="article-content_top"><span class="article-content_title">Modular Assets: The Future of
-              DeFi</span><span class="article-content_info">Oct 21, 2024</span></div>
-          <a href="#" class="article-content_link">→ Read More</a>
-        </div>
-      </div>
-      <div class="blog_article">
-        <div class="article-img"><img src="images/card-image-02.webp" loading="lazy" alt="" class="article-img_img">
-        </div>
-        <div class="article-content">
-          <div class="article-content_top"><span class="article-content_title">Modular Assets: The Future of
-              DeFi</span><span class="article-content_info">Oct 21, 2024</span></div>
-          <a href="#" class="article-content_link">→ Read More</a>
+        <div class="w-dyn-empty">
+          <div>No items found.</div>
         </div>
       </div>
-      <div class="blog_article">
-        <div class="article-img"><img src="images/card-image-02.webp" loading="lazy" alt="" class="article-img_img">
-        </div>
-        <div class="article-content">
-          <div class="article-content_top"><span class="article-content_title">Modular Assets: The Future of
-              DeFi</span><span class="article-content_info">Oct 21, 2024</span></div>
-          <a href="#" class="article-content_link">→ Read More</a>
-        </div>
+      <div class="blog_link">
+        <a href="#" class="is-blog">Read More</a><span class="link-symbol">↗</span>
       </div>
-      <div class="blog_article">
-        <div class="article-img"><img src="images/card-image-02.webp" loading="lazy" alt="" class="article-img_img">
-        </div>
-        <div class="article-content">
-          <div class="article-content_top"><span class="article-content_title">Modular Assets: The Future of
-              DeFi</span><span class="article-content_info">Oct 21, 2024</span></div>
-          <a href="#" class="article-content_link">→ Read More</a>
-        </div>
-      </div>
-    </div>
-    <div class="blog_link">
-      <a href="#" class="is-blog">Read More</a><span class="link-symbol">↗</span>
+      <a rel="noopener noreferrer" target="_blank" href="#" class="cta is-blog">Read more</a>
     </div>
   </section>
   <section class="section_footer">
-    <div class="footer_left"><span class="is-white">©2025 Veda®.   All Rights Reserved.</span></div>
+    <div class="footer_left"><span class="footer-info">©2025 Veda®.   All Rights Reserved.</span></div>
     <div class="footer_right">
       <div class="mail-wrap">
         <div class="mail-info"><span class="is-p-big is-white-100">Sign up for updates from Veda.</span><span
             class="is-p-big is-white-50">Get the latest in yield infra, DeFi, and so much more.</span></div>
-        <div class="form w-form">
+        <div id="is-email" class="form w-form">
           <form id="email-form" name="email-form" data-name="Email Form" method="get" class="email-form"
             data-wf-page-id="68271570945b21be587338e0" data-wf-element-id="b1b26c5c-0259-ff27-099c-c6fa56abdfc9"><input
               class="mail-form_input w-input" maxlength="256" name="email" data-name="Email" placeholder="Email"
@@ -1363,7 +1474,7 @@
   <script type="module" src="http://localhost:3000/@vite/client"></script>
   <script type="module" src="http://localhost:3000/src/main.js"></script>
   <!-- 
-<script src="https://cdn.jsdelivr.net/gh/jb-holographik/veda@release/main.js?v=0.1.1"></script>
+<script src="https://cdn.jsdelivr.net/gh/jb-holographik/veda@release/main.js?v=0.2"></script>
  -->
 </body>
 
