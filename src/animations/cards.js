@@ -20,6 +20,7 @@ window.addEventListener('load', () => {
         slidesPerView: 1,
       },
       992: {
+        //bug fix
         slidesPerView: 3,
       },
     },
