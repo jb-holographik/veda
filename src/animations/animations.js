@@ -3,12 +3,14 @@ import ScrollTrigger from 'gsap/ScrollTrigger'
 
 gsap.registerPlugin(ScrollTrigger)
 
+// --- HIGHLIGHTS ---
+
 const highlights = document.querySelectorAll('.highlight')
 let current = 0
 let isAnimating = false
 
 function showHighlight(nextIndex) {
-  if (isAnimating) return
+  if (!highlights.length || isAnimating) return
   isAnimating = true
 
   const prevIndex = Array.from(highlights).findIndex((el) =>
@@ -26,7 +28,6 @@ function showHighlight(nextIndex) {
       onComplete: () => {
         prev.classList.remove('is-active')
         prev.style.transform = ''
-        // Entrée du nouveau highlight
         gsap.fromTo(
           next,
           { y: '100%', opacity: 0 },
@@ -45,7 +46,6 @@ function showHighlight(nextIndex) {
       },
     })
   } else {
-    // Premier affichage ou même highlight
     gsap.fromTo(
       next,
       { y: '100%', opacity: 0 },
@@ -71,7 +71,6 @@ function cycleHighlights() {
 }
 
 if (highlights.length > 0) {
-  // Initial state
   highlights.forEach((el, i) => {
     if (i === 0) el.classList.add('is-active')
     else el.classList.remove('is-active')
@@ -79,63 +78,157 @@ if (highlights.length > 0) {
   setInterval(cycleHighlights, 7500)
 }
 
-//overlay animation
-gsap.to('.selector-overlay', {
-  x: '0%', // de -100% à 0%
-  ease: 'none',
-  scrollTrigger: {
-    trigger: '.defi-inner',
+// --- OVERLAY ANIMATION ---
+
+let defiInactivityTimeout
+let defiIsScrolling = false
+let defiIsAutoScrolling = false
+let defiTrigger = null
+
+function isPinnedAtTop(rect) {
+  // Considérer comme épinglé si la position est à 1px près
+  return Math.abs(rect.top) <= 1
+}
+
+function startDefiInactivityTimer(trigger) {
+  clearTimeout(defiInactivityTimeout)
+  const sectionRect = sectionDefi.getBoundingClientRect()
+  const pinned = isPinnedAtTop(sectionRect)
+
+  if (!defiIsAutoScrolling && pinned) {
+    defiInactivityTimeout = setTimeout(() => {
+      const currentRect = sectionDefi.getBoundingClientRect()
+      if (
+        !defiIsScrolling &&
+        isPinnedAtTop(currentRect) &&
+        trigger.progress < 1
+      ) {
+        defiIsAutoScrolling = true
+        gsap.to('.selector-overlay', {
+          x: '0%',
+          duration: 1,
+          ease: 'power1.inOut',
+          onComplete: () => {
+            defiIsAutoScrolling = false
+            trigger.scroll(trigger.end)
+          },
+        })
+      }
+    }, 4000)
+  }
+}
+
+function handleDefiScroll() {
+  if (!defiIsScrolling) {
+    defiIsScrolling = true
+    clearTimeout(defiInactivityTimeout)
+  }
+
+  clearTimeout(window.scrollTimeout)
+  window.scrollTimeout = setTimeout(() => {
+    defiIsScrolling = false
+    if (
+      !defiIsAutoScrolling &&
+      defiTrigger &&
+      isPinnedAtTop(sectionDefi.getBoundingClientRect())
+    ) {
+      startDefiInactivityTimer(defiTrigger)
+    }
+  }, 150)
+}
+
+const defiInner = document.querySelector('.defi-inner')
+const sectionDefi = document.querySelector('.section_defi')
+
+if (defiInner && sectionDefi) {
+  defiTrigger = ScrollTrigger.create({
+    trigger: defiInner,
     start: 'top top',
     end: 'bottom top',
     scrub: true,
-    pin: '.section_defi',
+    pin: sectionDefi,
     anticipatePin: 1,
-  },
-})
+    markers: false,
+    onEnter: (self) => {
+      const rect = sectionDefi.getBoundingClientRect()
+      window.addEventListener('scroll', handleDefiScroll, { passive: true })
+      if (isPinnedAtTop(rect)) {
+        startDefiInactivityTimer(self)
+      }
+    },
+    onLeave: () => {
+      clearTimeout(defiInactivityTimeout)
+      window.removeEventListener('scroll', handleDefiScroll)
+    },
+    onEnterBack: (self) => {
+      const rect = sectionDefi.getBoundingClientRect()
+      window.addEventListener('scroll', handleDefiScroll, { passive: true })
+      if (isPinnedAtTop(rect)) {
+        startDefiInactivityTimer(self)
+      }
+    },
+    onLeaveBack: () => {
+      clearTimeout(defiInactivityTimeout)
+      window.removeEventListener('scroll', handleDefiScroll)
+    },
+    onUpdate: (self) => {
+      gsap.to('.selector-overlay', {
+        x: `${(1 - self.progress) * 100}%`,
+        ease: 'none',
+        duration: 0.1,
+      })
 
-//overlay button animation
-const cta = document.querySelector('.cta.is-animated')
-const shadow = cta.querySelector('.cta-shadow')
-
-// Initial setup (if needed)
-gsap.set(shadow, { opacity: 0, width: 0 })
-
-const tl = gsap.timeline({ repeat: -1, repeatDelay: 1 })
-
-// Étape 1 : scale down du bouton
-tl.to(cta, {
-  scale: 0.8,
-  duration: 0.2,
-  ease: 'power1.out',
-})
-
-  // Étape 2 : opacity à 0.4 (immédiatement après le scale down)
-  .to(shadow, {
-    opacity: 0.4,
-    duration: 0.01,
+      // Démarrer le timer si la section est épinglée et qu'on n'est pas en train de scroller
+      const rect = sectionDefi.getBoundingClientRect()
+      if (isPinnedAtTop(rect) && !defiIsScrolling && !defiIsAutoScrolling) {
+        startDefiInactivityTimer(self)
+      }
+    },
   })
 
-  // Étape 3 : scale up du bouton + anim du shadow (width + opacity en même temps)
-  .to(
-    cta,
-    {
-      scale: 1,
-      duration: 0.4,
-      ease: 'power2.out',
-    },
-    '>'
-  )
+  // Cleanup on page unload
+  window.addEventListener('beforeunload', () => {
+    clearTimeout(defiInactivityTimeout)
+    window.removeEventListener('scroll', handleDefiScroll)
+  })
+}
 
-  .to(
-    shadow,
-    {
-      width: '100%',
-      opacity: 0,
-      duration: 0.4,
-      ease: 'power2.out',
-    },
-    '<'
-  ) // commence en même temps que le scale
+// --- CTA ANIMATION ---
 
-  // Étape 4 : reset width à 0 instantanément
-  .set(shadow, { width: 0 })
+const cta = document.querySelector('.cta.is-animated')
+if (cta) {
+  const shadow = cta.querySelector('.cta-shadow')
+  gsap.set(shadow, { opacity: 0, width: 0 })
+
+  const tl = gsap.timeline({ repeat: -1, repeatDelay: 1 })
+
+  tl.to(cta, {
+    scale: 0.8,
+    duration: 0.2,
+    ease: 'power1.out',
+  })
+    .to(shadow, {
+      opacity: 0.4,
+      duration: 0.01,
+    })
+    .to(
+      cta,
+      {
+        scale: 1,
+        duration: 0.4,
+        ease: 'power2.out',
+      },
+      '>'
+    )
+    .to(
+      shadow,
+      {
+        width: '100%',
+        opacity: 0,
+        duration: 0.4,
+        ease: 'power2.out',
+      },
+      '<'
+    )
+    .set(shadow, { width: 0 })
+}

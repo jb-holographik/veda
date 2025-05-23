@@ -1,8 +1,11 @@
 import Swiper from 'swiper'
 import 'swiper/css'
+
 console.log('✅ VEDA version 0.3.8')
+
 window.addEventListener('load', () => {
   const container = document.querySelector('.cards-slider')
+  if (!container) return // ✅ Sécurité si l'élément n'existe pas
 
   const swiper = new Swiper(container, {
     slidesPerView: 3,
@@ -20,7 +23,6 @@ window.addEventListener('load', () => {
         slidesPerView: 1,
       },
       992: {
-        //bug fix
         slidesPerView: 3,
       },
     },
@@ -30,22 +32,28 @@ window.addEventListener('load', () => {
       },
     },
   })
-  document
-    .querySelector('.swiper-button-next')
-    .addEventListener('click', () => {
+
+  const nextBtn = container.querySelector('.swiper-button-next')
+  const prevBtn = container.querySelector('.swiper-button-prev')
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
       swiper.slideNext()
     })
+  }
 
-  document
-    .querySelector('.swiper-button-prev')
-    .addEventListener('click', () => {
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
       swiper.slidePrev()
     })
+  }
+
+  setEqualCardHeights()
+  window.addEventListener('resize', setEqualCardHeights)
 })
 
 function setEqualCardHeights() {
   const cards = document.querySelectorAll('.swiper-slide.card')
-
   if (!cards.length) return
 
   let maxHeight = 0
@@ -63,6 +71,3 @@ function setEqualCardHeights() {
     card.style.height = `${maxHeight}px`
   })
 }
-
-window.addEventListener('load', setEqualCardHeights)
-window.addEventListener('resize', setEqualCardHeights)

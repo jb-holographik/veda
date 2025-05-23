@@ -134,8 +134,9 @@ window.Webflow.push(() => {
     loop: true,
     centeredSlides: true,
     spaceBetween: 32,
+    speed: 500,
     autoplay: {
-      delay: 4000,
+      delay: 3000,
       reverseDirection: true,
       disableOnInteraction: false,
     },
@@ -147,9 +148,7 @@ window.Webflow.push(() => {
       },
       768: {
         direction: 'horizontal',
-        slidesPerView: 4,
-        centeredSlides: false,
-        initialSlide: 2,
+        slidesPerView: 3.5,
       },
       992: {
         direction: 'vertical',
@@ -195,6 +194,7 @@ window.Webflow.push(() => {
     loop: true,
     centeredSlides: true,
     spaceBetween: 32,
+    speed: 500,
     autoplay: false, // Désactiver l'autoplay car il sera contrôlé par le slider gauche
     breakpoints: {
       320: {
@@ -204,9 +204,7 @@ window.Webflow.push(() => {
       },
       768: {
         direction: 'horizontal',
-        slidesPerView: 4,
-        centeredSlides: false,
-        initialSlide: 2,
+        slidesPerView: 3.5,
       },
       992: {
         direction: 'vertical',
@@ -284,8 +282,9 @@ window.addEventListener('resize', () => {
         loop: true,
         centeredSlides: true,
         spaceBetween: 32,
+        speed: 500,
         autoplay: {
-          delay: 4000,
+          delay: 3000,
           reverseDirection: true,
           disableOnInteraction: false,
         },
@@ -297,9 +296,7 @@ window.addEventListener('resize', () => {
           },
           768: {
             direction: 'horizontal',
-            slidesPerView: 4,
-            centeredSlides: false,
-            initialSlide: 2,
+            slidesPerView: 3.5,
           },
           992: {
             direction: 'vertical',
@@ -331,6 +328,7 @@ window.addEventListener('resize', () => {
         loop: true,
         centeredSlides: true,
         spaceBetween: 32,
+        speed: 500,
         autoplay: false,
         breakpoints: {
           320: {
@@ -340,9 +338,7 @@ window.addEventListener('resize', () => {
           },
           768: {
             direction: 'horizontal',
-            slidesPerView: 4,
-            centeredSlides: false,
-            initialSlide: 2,
+            slidesPerView: 3.5,
           },
           992: {
             direction: 'vertical',

@@ -1,37 +1,33 @@
 import { gsap } from 'gsap'
+import { ScrollToPlugin } from 'gsap/ScrollToPlugin'
 import ScrollTrigger from 'gsap/ScrollTrigger'
 
-gsap.registerPlugin(ScrollTrigger)
+gsap.registerPlugin(ScrollTrigger, ScrollToPlugin)
 
-// Sélection des éléments
-const container = document.querySelector('.widgets-texts')
-const texts = container.querySelectorAll('.widgets_text')
-const lotties = document.querySelectorAll('.widget')
+// Variables globales
+let inactivityTimeout
+let isScrolling = false
+let autoScrolling = false
+let hasReachedTop = false
 
-// Fonction pour mettre à jour l'opacité des textes
-function updateTextsOpacity(activeIndex) {
+function updateWrapperHeight(wrapper, container, texts) {
+  if (!wrapper || !container || !texts.length) return
+  const singleTextHeight = texts[0].offsetHeight
+  wrapper.style.height = `${singleTextHeight * 3}px`
+  container.style.height = `${singleTextHeight * 4}px`
+}
+
+function updateTextsOpacity(activeIndex, texts, lotties) {
   texts.forEach((text, i) => {
+    const distance = i - activeIndex
     let opacity = 0
-    const distanceFromActive = i - activeIndex
+    if (distance === 0) opacity = 1
+    else if (distance === 1) opacity = 0.2
+    else if (distance === 2) opacity = 0.08
 
-    if (distanceFromActive === 0) opacity = 1
-    // Texte actif
-    else if (distanceFromActive === 1) opacity = 0.2
-    // Premier texte après
-    else if (distanceFromActive === 2) opacity = 0.08
-    // Deuxième texte après
-    else if (distanceFromActive === 3) opacity = 0
-    // Troisième texte après
-    else opacity = 0 // Tous les autres textes
-
-    gsap.to(text, {
-      opacity,
-      duration: 0.2,
-      overwrite: true,
-    })
+    gsap.to(text, { opacity, duration: 0.2, overwrite: true })
   })
 
-  // Mettre à jour la visibilité des animations Lottie
   lotties.forEach((lottie, i) => {
     gsap.to(lottie, {
       opacity: i === activeIndex ? 1 : 0,
@@ -41,70 +37,134 @@ function updateTextsOpacity(activeIndex) {
   })
 }
 
-// Fonction pour mettre à jour la hauteur du container
-function updateContainerHeight() {
-  if (!container || !texts.length) return
+function startAutoScrollAnimation(section) {
+  function scrollToNextSection() {
+    const trigger = ScrollTrigger.getById('widgets-trigger')
+    if (!trigger) return
 
-  // Calculer la hauteur d'un seul widgets_text
-  const singleTextHeight = texts[0].offsetHeight
+    const progress = trigger.progress
+    let targetProgress
 
-  // Appliquer la hauteur totale au container (4x la hauteur d'un texte)
-  container.style.height = `${singleTextHeight * 4}px`
+    if (progress < 0.25) targetProgress = 0.25
+    else if (progress < 0.5) targetProgress = 0.5
+    else if (progress < 0.75) targetProgress = 0.75
+    else {
+      clearTimeout(inactivityTimeout)
+      window.removeEventListener('scroll', handleScroll)
+      return
+    }
 
-  // Forcer un refresh de ScrollTrigger
-  ScrollTrigger.refresh()
+    autoScrolling = true
+    const scrollDistance = section.offsetHeight * (targetProgress - progress)
+    const currentScroll = window.pageYOffset
+
+    window.scrollTo({
+      top: currentScroll + scrollDistance,
+      behavior: 'smooth',
+    })
+
+    setTimeout(() => {
+      autoScrolling = false
+      startInactivityTimer()
+    }, 1000)
+  }
+
+  function startInactivityTimer() {
+    clearTimeout(inactivityTimeout)
+    if (!autoScrolling) {
+      inactivityTimeout = setTimeout(() => {
+        if (!isScrolling && hasReachedTop) {
+          scrollToNextSection()
+        }
+      }, 5000)
+    }
+  }
+
+  function handleScroll() {
+    if (!isScrolling) {
+      isScrolling = true
+      clearTimeout(inactivityTimeout)
+    }
+
+    clearTimeout(window.scrollTimeout)
+    window.scrollTimeout = setTimeout(() => {
+      isScrolling = false
+      if (!autoScrolling && hasReachedTop) {
+        startInactivityTimer()
+      }
+    }, 150)
+  }
+
+  startInactivityTimer()
+  window.addEventListener('scroll', handleScroll, { passive: true })
+
+  window.addEventListener('beforeunload', () => {
+    clearTimeout(inactivityTimeout)
+    window.removeEventListener('scroll', handleScroll)
+  })
 }
 
-// Attendre que le DOM soit complètement chargé
-document.addEventListener('DOMContentLoaded', () => {
-  // Initialiser la hauteur du container
-  updateContainerHeight()
+function initWidgetsAnimation() {
+  const container = document.querySelector('.widgets-texts')
+  const wrapper = document.querySelector('.widgets-text-wrapper')
+  const texts = container?.querySelectorAll('.widgets_text') || []
+  const lotties = document.querySelectorAll('.widget')
+  const section = document.querySelector('.section_widgets')
 
-  // Reset de la position initiale
-  gsap.set(container, {
-    y: 0,
+  if (!container || !wrapper || !texts.length || !section) return
+
+  updateWrapperHeight(wrapper, container, texts)
+
+  gsap.set(container, { y: 0 })
+  texts.forEach((text, i) => {
+    gsap.set(text, {
+      opacity: i === 0 ? 1 : i === 1 ? 0.2 : i === 2 ? 0.08 : 0,
+    })
+  })
+  lotties.forEach((lottie, i) => {
+    gsap.set(lottie, { opacity: i === 0 ? 1 : 0 })
   })
 
-  // Initialiser l'opacité des textes avec le premier texte actif
-  updateTextsOpacity(0)
-
-  // Créer l'animation de scroll
   ScrollTrigger.create({
-    trigger: '.section_widgets',
+    id: 'widgets-trigger',
+    trigger: section,
     start: 'top top',
     end: 'bottom bottom',
     scrub: true,
+    onEnter: () => {
+      hasReachedTop = true
+      startAutoScrollAnimation(section, container)
+    },
+    onLeaveBack: () => {
+      hasReachedTop = false
+      clearTimeout(inactivityTimeout)
+    },
     onUpdate: (self) => {
-      // Calculer l'index actif basé sur le pourcentage de scroll
+      if (!self.isActive) return
+
       const progress = self.progress
       let activeIndex = 0
-
       if (progress >= 0.75) activeIndex = 3
       else if (progress >= 0.5) activeIndex = 2
       else if (progress >= 0.25) activeIndex = 1
 
-      // Calculer le déplacement vertical
       const singleTextHeight = texts[0].offsetHeight
       const yOffset = -singleTextHeight * activeIndex
 
-      // Animer le container de textes
       gsap.to(container, {
         y: yOffset,
         duration: 0.2,
         overwrite: true,
       })
 
-      // Mettre à jour l'opacité des textes
-      updateTextsOpacity(activeIndex)
+      updateTextsOpacity(activeIndex, texts, lotties)
     },
   })
-})
 
-// Gestionnaire de redimensionnement avec debounce
-let resizeTimeout
-window.addEventListener('resize', () => {
-  clearTimeout(resizeTimeout)
-  resizeTimeout = setTimeout(() => {
-    updateContainerHeight()
-  }, 200)
-})
+  window.addEventListener('resize', () => {
+    updateWrapperHeight(wrapper, container, texts)
+    ScrollTrigger.refresh()
+  })
+}
+
+document.addEventListener('DOMContentLoaded', initWidgetsAnimation)
