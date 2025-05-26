@@ -135,6 +135,7 @@ window.Webflow.push(() => {
     centeredSlides: true,
     spaceBetween: 32,
     speed: 500,
+    allowTouchMove: false,
     autoplay: {
       delay: 3000,
       reverseDirection: true,
@@ -194,6 +195,7 @@ window.Webflow.push(() => {
     loop: true,
     centeredSlides: true,
     spaceBetween: 32,
+    allowTouchMove: false,
     speed: 500,
     autoplay: false, // Désactiver l'autoplay car il sera contrôlé par le slider gauche
     breakpoints: {
