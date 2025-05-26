@@ -1,12 +1,12 @@
 import './styles/style.css'
 import './animations/slider.js'
 import './animations/animations.js'
-import './animations/widgets.js'
+// import './animations/widgets.js'
 import './animations/cards.js'
 import './animations/testimonials.js'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-// import Lenis from 'lenis'
+import Lenis from 'lenis'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -33,8 +33,6 @@ document.addEventListener(
 import { fetchAndDisplayTVL } from './utils/data.js'
 fetchAndDisplayTVL()
 
-// LENIS DÉSACTIVÉ TEMPORAIREMENT
-/*
 const lenis = new Lenis({
   duration: 0.5,
   easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // alternative à 'ease-in-out'
@@ -50,18 +48,17 @@ gsap.ticker.add((time) => {
 })
 
 gsap.ticker.lagSmoothing(0)
-*/
 
 // Gestionnaire de redimensionnement
 window.addEventListener('resize', () => {
-  // lenis.resize()
-  ScrollTrigger.refresh()
+  lenis.resize()
+  // ScrollTrigger.refresh() // ⚠️ TEMPORAIREMENT DÉSACTIVÉ POUR TEST
 })
 
 // Observer les changements de hauteur du contenu
 const resizeObserver = new ResizeObserver(() => {
-  // lenis.resize()
-  ScrollTrigger.refresh()
+  lenis.resize()
+  // ScrollTrigger.refresh() // ⚠️ TEMPORAIREMENT DÉSACTIVÉ POUR TEST
 })
 
 // Observer le body pour les changements de hauteur
@@ -70,5 +67,4 @@ resizeObserver.observe(document.body)
 // Optionnel : scroll to top
 // lenis.scrollTo(0)
 
-// export default lenis
-export default null
+export default lenis
