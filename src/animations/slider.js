@@ -305,13 +305,26 @@ window.addEventListener('resize', () => {
       lastWindowWidth = window.innerWidth
 
       if (leftSlider && rightSlider) {
-        // Sauvegarder les index actuels
+        // Sauvegarder les propriétés AVANT la destruction
         const leftCurrentIndex = leftSlider.activeIndex
         const rightCurrentIndex = rightSlider.activeIndex
+        const leftSlidesLength = leftSlider.slides.length
+        const rightSlidesLength = rightSlider.slides.length
+        const leftIsLoop = leftSlider.params.loop
+        const rightIsLoop = rightSlider.params.loop
 
         // Détruire et recréer les instances pour une réinitialisation complète
         leftSlider.destroy(true, true)
         rightSlider.destroy(true, true)
+
+        // Calculer l'index initial correct pour les sliders en boucle
+        const leftInitialSlide = leftIsLoop
+          ? leftCurrentIndex % (leftSlidesLength / 2)
+          : leftCurrentIndex % leftSlidesLength
+
+        const rightInitialSlide = rightIsLoop
+          ? rightCurrentIndex % (rightSlidesLength / 2)
+          : rightCurrentIndex % rightSlidesLength
 
         // Réinitialiser les sliders
         leftSlider = new Swiper('.hero-animation', {
@@ -358,9 +371,7 @@ window.addEventListener('resize', () => {
               })
             },
           },
-          initialSlide:
-            leftCurrentIndex %
-            (leftSlider.slides.length / (leftSlider.params.loop ? 2 : 1)),
+          initialSlide: leftInitialSlide,
         })
 
         rightSlider = new Swiper('.hero-animation-2', {
@@ -394,9 +405,7 @@ window.addEventListener('resize', () => {
               updatePrevSlideOpacity(swiper)
             },
           },
-          initialSlide:
-            rightCurrentIndex %
-            (rightSlider.slides.length / (rightSlider.params.loop ? 2 : 1)),
+          initialSlide: rightInitialSlide,
         })
       }
     }
