@@ -10,6 +10,16 @@ let isScrolling = false
 let autoScrolling = false
 let hasReachedTop = false
 
+// Fonction pour détecter si on est sur mobile
+function isMobile() {
+  return (
+    window.innerWidth <= 991 ||
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    )
+  )
+}
+
 function updateWrapperHeight(wrapper, container, texts) {
   if (!wrapper || !container || !texts.length) return
   const singleTextHeight = texts[0].offsetHeight
@@ -133,7 +143,9 @@ function initWidgetsAnimation() {
     scrub: true,
     onEnter: () => {
       hasReachedTop = true
-      startAutoScrollAnimation(section, container)
+      if (!isMobile()) {
+        startAutoScrollAnimation(section, container)
+      }
     },
     onLeaveBack: () => {
       hasReachedTop = false
