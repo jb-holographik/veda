@@ -10,11 +10,11 @@ gsap.registerPlugin(ScrollTrigger)
 let leftSlider, rightSlider
 
 // Fonction pour gérer les médias (vidéos et Lottie)
-function handleMedia(slide, isActive) {
+function handleMedia(slide, isActive, allowVideoPlay = true) {
   // Gestion des vidéos
   const video = slide.querySelector('video')
   if (video) {
-    if (isActive) {
+    if (isActive && allowVideoPlay) {
       video.play().catch((err) => console.warn('Erreur lecture vidéo :', err))
     } else {
       video.pause()
@@ -226,19 +226,19 @@ window.Webflow.push(() => {
     on: {
       init(swiper) {
         updatePrevSlideOpacity(swiper)
-        // S'assurer que tous les médias sont en pause
+        // S'assurer que tous les médias sont en pause (vidéos ne se lancent jamais)
         swiper.slides.forEach((slide) => {
-          handleMedia(slide, false)
+          handleMedia(slide, false, false)
         })
       },
       slideChangeTransitionStart(swiper) {
         updatePrevSlideOpacity(swiper)
       },
       slideChangeTransitionEnd(swiper) {
-        // Gérer tous les médias lors des changements de slides
+        // Gérer tous les médias lors des changements de slides (vidéos restent en pause)
         swiper.slides.forEach((slide) => {
           const isActive = slide.classList.contains('swiper-slide-active')
-          handleMedia(slide, isActive)
+          handleMedia(slide, isActive, false)
         })
       },
     },
