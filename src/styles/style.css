@@ -75,13 +75,17 @@
   height: 2.813rem !important;
 }
 
-.swiper-slide {
+.hero-animation .swiper-slide,
+.hero-animation-2 .swiper-slide {
   opacity: 0;
 }
 
-.swiper-slide-prev,
-.swiper-slide-next,
-.swiper-slide-active {
+.hero-animation .swiper-slide-prev,
+.hero-animation .swiper-slide-next,
+.hero-animation .swiper-slide-active,
+.hero-animation-2 .swiper-slide-prev,
+.hero-animation-2 .swiper-slide-next,
+.hero-animation-2 .swiper-slide-active {
   opacity: 1;
 }
 
