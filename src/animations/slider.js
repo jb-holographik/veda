@@ -19,6 +19,8 @@ function handleMedia(slide, isActive) {
     } else {
       video.pause()
       video.currentTime = 0
+      // S'assurer que la première frame est visible sur mobile
+      video.load()
     }
   }
 
@@ -61,6 +63,11 @@ function addFallbackVideoSources() {
       const originalSrc = video.getAttribute('src')
       if (!originalSrc) return
 
+      // Ajouter des attributs pour améliorer l'affichage sur mobile
+      video.setAttribute('preload', 'metadata')
+      video.setAttribute('playsinline', 'true')
+      video.setAttribute('muted', 'true')
+
       // Créer la structure source pour WebM et MP4
       video.removeAttribute('src')
 
@@ -78,6 +85,9 @@ function addFallbackVideoSources() {
       // Ajouter les sources à la vidéo
       video.appendChild(sourceWebm)
       video.appendChild(sourceMp4)
+
+      // Forcer le chargement de la première frame
+      video.load()
 
       // Gérer les erreurs de chargement
       video.addEventListener(
@@ -223,6 +233,13 @@ window.Webflow.push(() => {
       },
       slideChangeTransitionStart(swiper) {
         updatePrevSlideOpacity(swiper)
+      },
+      slideChangeTransitionEnd(swiper) {
+        // Gérer tous les médias lors des changements de slides
+        swiper.slides.forEach((slide) => {
+          const isActive = slide.classList.contains('swiper-slide-active')
+          handleMedia(slide, isActive)
+        })
       },
     },
   })
