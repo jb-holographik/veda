@@ -135,50 +135,48 @@ function initWidgetsAnimation() {
     gsap.set(lottie, { opacity: i === 0 ? 1 : 0 })
   })
 
-  ScrollTrigger.create({
-    id: 'widgets-trigger',
-    trigger: section,
-    start: 'top top',
-    end: 'bottom bottom',
-    scrub: false,
-    onEnter: () => {
-      hasReachedTop = true
-      if (!isMobile()) {
+  // Ne créer le ScrollTrigger que sur desktop
+  if (!isMobile()) {
+    ScrollTrigger.create({
+      id: 'widgets-trigger',
+      trigger: section,
+      start: 'top top',
+      end: 'bottom bottom',
+      scrub: true,
+      onEnter: () => {
+        hasReachedTop = true
         startAutoScrollAnimation(section, container)
-      }
-    },
-    onLeaveBack: () => {
-      hasReachedTop = false
-      clearTimeout(inactivityTimeout)
-    },
-    onUpdate: (self) => {
-      if (!self.isActive) return
+      },
+      onLeaveBack: () => {
+        hasReachedTop = false
+        clearTimeout(inactivityTimeout)
+      },
+      onUpdate: (self) => {
+        if (!self.isActive) return
 
-      // Désactiver les animations de texte sur mobile
-      if (isMobile()) return
+        const progress = self.progress
+        let activeIndex = 0
+        if (progress >= 0.75) activeIndex = 3
+        else if (progress >= 0.5) activeIndex = 2
+        else if (progress >= 0.25) activeIndex = 1
 
-      const progress = self.progress
-      let activeIndex = 0
-      if (progress >= 0.75) activeIndex = 3
-      else if (progress >= 0.5) activeIndex = 2
-      else if (progress >= 0.25) activeIndex = 1
+        const singleTextHeight = texts[0].offsetHeight
+        const yOffset = -singleTextHeight * activeIndex
 
-      const singleTextHeight = texts[0].offsetHeight
-      const yOffset = -singleTextHeight * activeIndex
+        gsap.to(container, {
+          y: yOffset,
+          duration: 0.2,
+          overwrite: true,
+        })
 
-      gsap.to(container, {
-        y: yOffset,
-        duration: 0.2,
-        overwrite: true,
-      })
-
-      updateTextsOpacity(activeIndex, texts, lotties)
-    },
-  })
+        updateTextsOpacity(activeIndex, texts, lotties)
+      },
+    })
+  }
 
   window.addEventListener('resize', () => {
     updateWrapperHeight(wrapper, container, texts)
-    ScrollTrigger.refresh() // ⚠️ DÉSACTIVÉ POUR ÉVITER LES SAUTS SUR MOBILE
+    // ScrollTrigger.refresh() // ⚠️ DÉSACTIVÉ POUR ÉVITER LES SAUTS SUR MOBILE
   })
 }
 
