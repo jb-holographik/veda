@@ -10,7 +10,7 @@ let current = 0
 let isAnimating = false
 
 document.addEventListener('DOMContentLoaded', () => {
-  const burger = document.querySelector('.navbar-burger')
+  const burger = document.querySelector('.navbar_burger')
   const navMenu = document.querySelector('.nav-menu')
 
   burger.addEventListener('click', () => {
