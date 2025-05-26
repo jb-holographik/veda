@@ -10,7 +10,12 @@ gsap.registerPlugin(ScrollTrigger)
 let leftSlider, rightSlider
 
 // Fonction pour gérer les médias (vidéos et Lottie)
-function handleMedia(slide, isActive, allowVideoPlay = true) {
+function handleMedia(
+  slide,
+  isActive,
+  allowVideoPlay = true,
+  allowLottiePlay = true
+) {
   // Gestion des vidéos
   const video = slide.querySelector('video')
   if (video) {
@@ -19,8 +24,11 @@ function handleMedia(slide, isActive, allowVideoPlay = true) {
     } else {
       video.pause()
       video.currentTime = 0
-      // S'assurer que la première frame est visible sur mobile
-      video.load()
+      // S'assurer que la première frame est visible sur mobile seulement si nécessaire
+      if (!video.hasAttribute('data-loaded')) {
+        video.load()
+        video.setAttribute('data-loaded', 'true')
+      }
     }
   }
 
@@ -39,11 +47,11 @@ function handleMedia(slide, isActive, allowVideoPlay = true) {
         .find((animation) => animation.wrapper === lottie)
 
       if (lottieInstance) {
-        if (isActive) {
-          // Pour les slides actifs, on joue l'animation
+        if (isActive && allowLottiePlay) {
+          // Pour les slides actifs, on joue l'animation seulement si autorisé
           lottieInstance.goToAndPlay(0)
         } else {
-          // Pour les slides inactifs, on met en pause et on revient au début
+          // Pour les slides inactifs ou si non autorisé, on met en pause et on revient au début
           lottieInstance.pause()
           lottieInstance.goToAndStop(0)
         }
@@ -86,8 +94,9 @@ function addFallbackVideoSources() {
       video.appendChild(sourceWebm)
       video.appendChild(sourceMp4)
 
-      // Forcer le chargement de la première frame
+      // Forcer le chargement de la première frame une seule fois
       video.load()
+      video.setAttribute('data-loaded', 'true')
 
       // Gérer les erreurs de chargement
       video.addEventListener(
@@ -226,19 +235,19 @@ window.Webflow.push(() => {
     on: {
       init(swiper) {
         updatePrevSlideOpacity(swiper)
-        // S'assurer que tous les médias sont en pause (vidéos ne se lancent jamais)
+        // S'assurer que tous les médias sont en pause (vidéos et Lottie ne se lancent jamais)
         swiper.slides.forEach((slide) => {
-          handleMedia(slide, false, false)
+          handleMedia(slide, false, false, false)
         })
       },
       slideChangeTransitionStart(swiper) {
         updatePrevSlideOpacity(swiper)
       },
       slideChangeTransitionEnd(swiper) {
-        // Gérer tous les médias lors des changements de slides (vidéos restent en pause)
+        // Gérer tous les médias lors des changements de slides (vidéos et Lottie restent en pause)
         swiper.slides.forEach((slide) => {
           const isActive = slide.classList.contains('swiper-slide-active')
-          handleMedia(slide, isActive, false)
+          handleMedia(slide, isActive, false, false)
         })
       },
     },
