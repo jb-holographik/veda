@@ -153,7 +153,7 @@ window.Webflow.push(() => {
     loop: true,
     centeredSlides: true,
     spaceBetween: 32,
-    speed: 500,
+    speed: 700,
     allowTouchMove: false,
     autoplay: {
       delay: 3000,
@@ -215,7 +215,7 @@ window.Webflow.push(() => {
     centeredSlides: true,
     spaceBetween: 32,
     allowTouchMove: false,
-    speed: 500,
+    speed: 700,
     autoplay: false, // Désactiver l'autoplay car il sera contrôlé par le slider gauche
     breakpoints: {
       320: {
@@ -333,7 +333,7 @@ window.addEventListener('resize', () => {
           loop: true,
           centeredSlides: true,
           spaceBetween: 32,
-          speed: 500,
+          speed: 700,
           autoplay: {
             delay: 3000,
             reverseDirection: true,
@@ -380,7 +380,7 @@ window.addEventListener('resize', () => {
           loop: true,
           centeredSlides: true,
           spaceBetween: 32,
-          speed: 500,
+          speed: 700,
           autoplay: false,
           breakpoints: {
             320: {
