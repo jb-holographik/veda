@@ -269,95 +269,112 @@ function updatePrevSlideOpacity(swiper) {
 
 // Gestionnaire de redimensionnement avec debounce
 let resizeTimeout
+let lastWindowWidth = window.innerWidth
+
 window.addEventListener('resize', () => {
   clearTimeout(resizeTimeout)
   resizeTimeout = setTimeout(() => {
-    if (leftSlider && rightSlider) {
-      // Détruire et recréer les instances pour une réinitialisation complète
-      leftSlider.destroy(true, true)
-      rightSlider.destroy(true, true)
+    // Ne réinitialiser que si la largeur a changé
+    if (lastWindowWidth !== window.innerWidth) {
+      lastWindowWidth = window.innerWidth
 
-      // Réinitialiser les sliders
-      leftSlider = new Swiper('.hero-animation', {
-        modules: [Autoplay],
-        slidesPerView: 3,
-        loop: true,
-        centeredSlides: true,
-        spaceBetween: 32,
-        speed: 500,
-        autoplay: {
-          delay: 3000,
-          reverseDirection: true,
-          disableOnInteraction: false,
-        },
-        breakpoints: {
-          320: {
-            direction: 'horizontal',
-            slidesPerView: 2.5,
-            spaceBetween: 16,
-          },
-          768: {
-            direction: 'horizontal',
-            slidesPerView: 3.5,
-          },
-          992: {
-            direction: 'vertical',
-            slidesPerView: 3,
-          },
-        },
-        on: {
-          init(swiper) {
-            updateSlideOpacity(swiper)
-          },
-          slideChangeTransitionStart(swiper) {
-            updateSlideOpacity(swiper)
-            if (rightSlider && !rightSlider.animating) {
-              rightSlider.slideNext()
-            }
-          },
-          slideChangeTransitionEnd(swiper) {
-            swiper.slides.forEach((slide) => {
-              const isActive = slide.classList.contains('swiper-slide-active')
-              handleMedia(slide, isActive)
-            })
-          },
-        },
-      })
+      if (leftSlider && rightSlider) {
+        // Sauvegarder les index actuels
+        const leftCurrentIndex = leftSlider.activeIndex
+        const rightCurrentIndex = rightSlider.activeIndex
 
-      rightSlider = new Swiper('.hero-animation-2', {
-        modules: [Autoplay],
-        slidesPerView: 3,
-        loop: true,
-        centeredSlides: true,
-        spaceBetween: 32,
-        speed: 500,
-        autoplay: false,
-        breakpoints: {
-          320: {
-            direction: 'horizontal',
-            slidesPerView: 2.5,
-            spaceBetween: 16,
+        // Détruire et recréer les instances pour une réinitialisation complète
+        leftSlider.destroy(true, true)
+        rightSlider.destroy(true, true)
+
+        // Réinitialiser les sliders
+        leftSlider = new Swiper('.hero-animation', {
+          modules: [Autoplay],
+          slidesPerView: 3,
+          loop: true,
+          centeredSlides: true,
+          spaceBetween: 32,
+          speed: 500,
+          autoplay: {
+            delay: 3000,
+            reverseDirection: true,
+            disableOnInteraction: false,
           },
-          768: {
-            direction: 'horizontal',
-            slidesPerView: 3.5,
+          breakpoints: {
+            320: {
+              direction: 'horizontal',
+              slidesPerView: 2.5,
+              spaceBetween: 16,
+            },
+            768: {
+              direction: 'horizontal',
+              slidesPerView: 3.5,
+            },
+            992: {
+              direction: 'vertical',
+              slidesPerView: 3,
+            },
           },
-          992: {
-            direction: 'vertical',
-            slidesPerView: 3,
+          on: {
+            init(swiper) {
+              updateSlideOpacity(swiper)
+            },
+            slideChangeTransitionStart(swiper) {
+              updateSlideOpacity(swiper)
+              if (rightSlider && !rightSlider.animating) {
+                rightSlider.slideNext()
+              }
+            },
+            slideChangeTransitionEnd(swiper) {
+              swiper.slides.forEach((slide) => {
+                const isActive = slide.classList.contains('swiper-slide-active')
+                handleMedia(slide, isActive)
+              })
+            },
           },
-        },
-        on: {
-          init(swiper) {
-            updatePrevSlideOpacity(swiper)
+          initialSlide:
+            leftCurrentIndex %
+            (leftSlider.slides.length / (leftSlider.params.loop ? 2 : 1)),
+        })
+
+        rightSlider = new Swiper('.hero-animation-2', {
+          modules: [Autoplay],
+          slidesPerView: 3,
+          loop: true,
+          centeredSlides: true,
+          spaceBetween: 32,
+          speed: 500,
+          autoplay: false,
+          breakpoints: {
+            320: {
+              direction: 'horizontal',
+              slidesPerView: 2.5,
+              spaceBetween: 16,
+            },
+            768: {
+              direction: 'horizontal',
+              slidesPerView: 3.5,
+            },
+            992: {
+              direction: 'vertical',
+              slidesPerView: 3,
+            },
           },
-          slideChangeTransitionStart(swiper) {
-            updatePrevSlideOpacity(swiper)
+          on: {
+            init(swiper) {
+              updatePrevSlideOpacity(swiper)
+            },
+            slideChangeTransitionStart(swiper) {
+              updatePrevSlideOpacity(swiper)
+            },
           },
-        },
-      })
+          initialSlide:
+            rightCurrentIndex %
+            (rightSlider.slides.length / (rightSlider.params.loop ? 2 : 1)),
+        })
+      }
     }
-  }, 300) // Délai de 300ms pour éviter trop d'appels pendant le redimensionnement
+  }, 300)
 })
 
 function initMarqueeScrollDirection() {
