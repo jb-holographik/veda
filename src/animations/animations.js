@@ -9,6 +9,15 @@ const highlights = document.querySelectorAll('.highlight')
 let current = 0
 let isAnimating = false
 
+document.addEventListener('DOMContentLoaded', () => {
+  const burger = document.querySelector('.navbar-burger')
+  const navMenu = document.querySelector('.nav-menu')
+
+  burger.addEventListener('click', () => {
+    navMenu.classList.toggle('is-active')
+  })
+})
+
 function showHighlight(nextIndex) {
   if (!highlights.length || isAnimating) return
   isAnimating = true
