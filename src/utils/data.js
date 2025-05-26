@@ -1,3 +1,4 @@
+// Utilitaire : formatage des grands nombres
 function formatAbbreviatedNumber(value) {
   const num = Number(value)
   if (isNaN(num)) return '$0'
@@ -9,25 +10,40 @@ function formatAbbreviatedNumber(value) {
   return `$${num}`
 }
 
+// TVL depuis DeFiLlama
 export async function fetchAndDisplayTVL() {
   try {
-    const res = await fetch('https://api.sevenseas.capital/tvl')
+    const res = await fetch('https://api.llama.fi/protocol/veda')
     const json = await res.json()
 
-    const totalTvlString = json.Response?.total_tvl
-    if (!totalTvlString)
-      throw new Error(`TVL is NaN – value received: ${totalTvlString}`)
+    // json.tvl est un tableau d'historique
+    const tvlHistory = json.tvl
+    if (!Array.isArray(tvlHistory) || tvlHistory.length === 0) {
+      throw new Error('TVL historique vide ou invalide.')
+    }
 
-    const abbreviated = formatAbbreviatedNumber(totalTvlString)
+    const latestTvlEntry = tvlHistory[tvlHistory.length - 1]
+    const totalTvl = latestTvlEntry.totalLiquidityUSD
+
+    if (typeof totalTvl !== 'number') {
+      throw new Error(`TVL is not a number – received: ${totalTvl}`)
+    }
+
+    const abbreviated = formatAbbreviatedNumber(totalTvl)
 
     const firstBlock = document.querySelector('.data_block')
     if (firstBlock) {
       const contentEl = firstBlock.querySelector('.data-content')
       if (contentEl) {
-        contentEl.textContent = `${abbreviated}`
+        contentEl.textContent = abbreviated
       }
     }
   } catch (error) {
-    console.error('Erreur lors du chargement de la TVL:', error)
+    console.error('Erreur lors du chargement du TVL depuis DeFiLlama:', error)
   }
 }
+
+// Lancer au chargement
+window.addEventListener('DOMContentLoaded', () => {
+  fetchAndDisplayTVL()
+})
