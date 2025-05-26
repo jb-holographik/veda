@@ -154,6 +154,9 @@ function initWidgetsAnimation() {
     onUpdate: (self) => {
       if (!self.isActive) return
 
+      // Désactiver les animations de texte sur mobile
+      if (isMobile()) return
+
       const progress = self.progress
       let activeIndex = 0
       if (progress >= 0.75) activeIndex = 3
