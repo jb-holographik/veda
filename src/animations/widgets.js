@@ -175,7 +175,7 @@ function initWidgetsAnimation() {
 
   window.addEventListener('resize', () => {
     updateWrapperHeight(wrapper, container, texts)
-    // ScrollTrigger.refresh() // ⚠️ DÉSACTIVÉ POUR ÉVITER LES SAUTS SUR MOBILE
+    ScrollTrigger.refresh() // ⚠️ DÉSACTIVÉ POUR ÉVITER LES SAUTS SUR MOBILE
   })
 }
 
