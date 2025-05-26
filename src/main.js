@@ -38,7 +38,7 @@ const lenis = new Lenis({
   easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // alternative à 'ease-in-out'
   lerp: 0.05,
   smoothWheel: true,
-  touchMultiplier: 2,
+  touchMultiplier: 0,
 })
 
 lenis.on('scroll', ScrollTrigger.update)
