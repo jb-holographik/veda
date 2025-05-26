@@ -140,7 +140,7 @@ function initWidgetsAnimation() {
     trigger: section,
     start: 'top top',
     end: 'bottom bottom',
-    scrub: true,
+    scrub: false,
     onEnter: () => {
       hasReachedTop = true
       if (!isMobile()) {
