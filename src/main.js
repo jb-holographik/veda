@@ -1,7 +1,7 @@
 import './styles/style.css'
 import './animations/slider.js'
 import './animations/animations.js'
-// import './animations/widgets.js'
+import './animations/widgets.js'
 import './animations/cards.js'
 import './animations/testimonials.js'
 import gsap from 'gsap'
