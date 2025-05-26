@@ -145,7 +145,8 @@
     left: auto;
   }
 
-  .swiper-slide {
+  .hero-animation.swiper-slide,
+  .hero-animation-2.swiper-slide {
     opacity: 1;
   }
 }
