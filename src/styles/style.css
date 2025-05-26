@@ -162,14 +162,4 @@
     padding-right: 3em;
     order: 1;
   }
-
-  .swiper-slide {
-    opacity: 0;
-  }
-
-  .swiper-slide-prev,
-  .swiper-slide-next,
-  .swiper-slide-active {
-    opacity: 1;
-  }
 }
