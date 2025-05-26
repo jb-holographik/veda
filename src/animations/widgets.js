@@ -86,7 +86,7 @@ function startAutoScrollAnimation(section) {
         if (!isScrolling && hasReachedTop) {
           scrollToNextSection()
         }
-      }, 5000)
+      }, 3000)
     }
   }
 

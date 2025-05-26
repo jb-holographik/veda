@@ -85,7 +85,7 @@ if (highlights.length > 0) {
     if (i === 0) el.classList.add('is-active')
     else el.classList.remove('is-active')
   })
-  setInterval(cycleHighlights, 7500)
+  setInterval(cycleHighlights, 3000)
 }
 
 // --- OVERLAY ANIMATION ---
@@ -124,7 +124,7 @@ function startDefiInactivityTimer(trigger) {
           },
         })
       }
-    }, 4000)
+    }, 3000)
   }
 }
 
