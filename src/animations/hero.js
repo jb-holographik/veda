@@ -56,77 +56,77 @@ function handleSlideMedia(slide, shouldPlay) {
 }
 
 // Créer et ajouter les marqueurs
-function createMarkers() {
-  // Supprimer les marqueurs existants
-  const existingMarkers = document.querySelectorAll('.viewport-marker')
-  existingMarkers.forEach((marker) => marker.remove())
+// function createMarkers() {
+//   // Supprimer les marqueurs existants
+//   const existingMarkers = document.querySelectorAll('.viewport-marker')
+//   existingMarkers.forEach((marker) => marker.remove())
 
-  // Créer les marqueurs
-  const startMarker = document.createElement('div')
-  const endMarker = document.createElement('div')
+//   // Créer les marqueurs
+//   const startMarker = document.createElement('div')
+//   const endMarker = document.createElement('div')
 
-  // Style commun de base
-  const markerStyle = `
-    position: fixed;
-    background-color: red;
-    z-index: 9999;
-    pointer-events: none;
-  `
+//   // Style commun de base
+//   const markerStyle = `
+//     position: fixed;
+//     background-color: red;
+//     z-index: 9999;
+//     pointer-events: none;
+//   `
 
-  // Adapter les marqueurs selon la taille d'écran
-  if (window.innerWidth <= 991) {
-    // Version mobile/tablette (marqueurs verticaux)
-    startMarker.style.cssText = `
-      ${markerStyle}
-      top: 0;
-      left: 40vw;
-      width: 2px;
-      height: 100%;
-    `
+//   // Adapter les marqueurs selon la taille d'écran
+//   if (window.innerWidth <= 991) {
+//     // Version mobile/tablette (marqueurs verticaux)
+//     startMarker.style.cssText = `
+//       ${markerStyle}
+//       top: 0;
+//       left: 40vw;
+//       width: 2px;
+//       height: 100%;
+//     `
 
-    endMarker.style.cssText = `
-      ${markerStyle}
-      top: 0;
-      left: 80vw;
-      width: 2px;
-      height: 100%;
-    `
+//     endMarker.style.cssText = `
+//       ${markerStyle}
+//       top: 0;
+//       left: 80vw;
+//       width: 2px;
+//       height: 100%;
+//     `
 
-    startMarker.innerHTML =
-      '<span style="position: absolute; left: 10px; top: 10px; background: red; color: white; padding: 2px 5px;">40%</span>'
-    endMarker.innerHTML =
-      '<span style="position: absolute; left: 10px; top: 10px; background: red; color: white; padding: 2px 5px;">80%</span>'
-  } else {
-    // Version desktop (marqueurs horizontaux)
-    startMarker.style.cssText = `
-      ${markerStyle}
-      left: 0;
-      top: 40vh;
-      width: 100%;
-      height: 2px;
-    `
+//     startMarker.innerHTML =
+//       '<span style="position: absolute; left: 10px; top: 10px; background: red; color: white; padding: 2px 5px;">40%</span>'
+//     endMarker.innerHTML =
+//       '<span style="position: absolute; left: 10px; top: 10px; background: red; color: white; padding: 2px 5px;">80%</span>'
+//   } else {
+//     // Version desktop (marqueurs horizontaux)
+//     startMarker.style.cssText = `
+//       ${markerStyle}
+//       left: 0;
+//       top: 40vh;
+//       width: 100%;
+//       height: 2px;
+//     `
 
-    endMarker.style.cssText = `
-      ${markerStyle}
-      left: 0;
-      top: 75vh;
-      width: 100%;
-      height: 2px;
-    `
+//     endMarker.style.cssText = `
+//       ${markerStyle}
+//       left: 0;
+//       top: 75vh;
+//       width: 100%;
+//       height: 2px;
+//     `
 
-    startMarker.innerHTML =
-      '<span style="position: absolute; left: 10px; top: -10px; background: red; color: white; padding: 2px 5px;">40%</span>'
-    endMarker.innerHTML =
-      '<span style="position: absolute; left: 10px; top: -10px; background: red; color: white; padding: 2px 5px;">75%</span>'
-  }
+//     startMarker.innerHTML =
+//       '<span style="position: absolute; left: 10px; top: -10px; background: red; color: white; padding: 2px 5px;">40%</span>'
+//     endMarker.innerHTML =
+//       '<span style="position: absolute; left: 10px; top: -10px; background: red; color: white; padding: 2px 5px;">75%</span>'
+//   }
 
-  startMarker.className = 'viewport-marker start-marker'
-  endMarker.className = 'viewport-marker end-marker'
+//   startMarker.className = 'viewport-marker start-marker'
+//   endMarker.className = 'viewport-marker end-marker'
 
-  // Ajouter les marqueurs au body
-  document.body.appendChild(startMarker)
-  document.body.appendChild(endMarker)
-}
+//   // Ajouter les marqueurs au body
+//   document.body.appendChild(startMarker)
+//   document.body.appendChild(endMarker)
+// }
 
 // Fonction pour vérifier la position des slides
 function checkSlidesPosition() {
@@ -192,7 +192,7 @@ function checkSlidesPosition() {
 function initPositionChecker() {
   // Désactiver l'autoplay de tous les Lottie au démarrage
   disableAllLottieAutoplay()
-  createMarkers()
+  // createMarkers()
   checkSlidesPosition()
 }
 
@@ -211,6 +211,6 @@ window.Webflow.push(() => {
 
 // Réinitialiser en cas de redimensionnement
 window.addEventListener('resize', () => {
-  createMarkers()
+  // createMarkers()
   initPositionChecker()
 })
