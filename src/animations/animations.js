@@ -88,157 +88,156 @@ if (highlights.length > 0) {
   setInterval(cycleHighlights, 3000)
 }
 
-// --- OVERLAY ANIMATION ---
-
-let defiInactivityTimeout
-let defiIsScrolling = false
-let defiIsAutoScrolling = false
-let defiTrigger = null
-
-function isPinnedAtTop(rect) {
-  // Considérer comme épinglé si la position est à 1px près
-  return Math.abs(rect.top) <= 1
-}
-
-function startDefiInactivityTimer(trigger) {
-  clearTimeout(defiInactivityTimeout)
-  const sectionRect = sectionDefi.getBoundingClientRect()
-  const pinned = isPinnedAtTop(sectionRect)
-
-  if (!defiIsAutoScrolling && pinned) {
-    defiInactivityTimeout = setTimeout(() => {
-      const currentRect = sectionDefi.getBoundingClientRect()
-      if (
-        !defiIsScrolling &&
-        isPinnedAtTop(currentRect) &&
-        trigger.progress < 1
-      ) {
-        defiIsAutoScrolling = true
-        gsap.to('.selector-overlay', {
-          x: '0%',
-          duration: 1,
-          ease: 'power1.inOut',
-          onComplete: () => {
-            defiIsAutoScrolling = false
-            trigger.scroll(trigger.end)
-          },
-        })
-      }
-    }, 3000)
-  }
-}
-
-function handleDefiScroll() {
-  if (!defiIsScrolling) {
-    defiIsScrolling = true
-    clearTimeout(defiInactivityTimeout)
-  }
-
-  clearTimeout(window.scrollTimeout)
-  window.scrollTimeout = setTimeout(() => {
-    defiIsScrolling = false
-    if (
-      !defiIsAutoScrolling &&
-      defiTrigger &&
-      isPinnedAtTop(sectionDefi.getBoundingClientRect())
-    ) {
-      startDefiInactivityTimer(defiTrigger)
-    }
-  }, 150)
-}
+// --- DEFI ANIMATION ---
 
 const defiInner = document.querySelector('.defi-inner')
 const sectionDefi = document.querySelector('.section_defi')
+const defiLottie = document.querySelector('.section_defi .selector-animation')
 
-if (defiInner && sectionDefi) {
-  defiTrigger = ScrollTrigger.create({
-    trigger: defiInner,
-    start: 'top top',
-    end: 'bottom top',
-    scrub: true,
-    pin: sectionDefi,
-    anticipatePin: 1,
-    markers: false,
-    onEnter: (self) => {
-      const rect = sectionDefi.getBoundingClientRect()
-      window.addEventListener('scroll', handleDefiScroll, { passive: true })
-      if (isPinnedAtTop(rect)) {
-        startDefiInactivityTimer(self)
+if (defiInner && sectionDefi && defiLottie) {
+  // Mettre le lottie en pause au démarrage
+  let defiLottieInstance = null
+
+  // Initialiser la position de l'overlay
+  const overlay = document.querySelector('.selector-overlay')
+  if (overlay) {
+    gsap.set(overlay, { x: '100%' })
+  }
+
+  // Fonction pour récupérer l'instance Lottie
+  const getLottieInstance = () => {
+    try {
+      if (window.Webflow && window.Webflow.require) {
+        const lottieInstances =
+          window.Webflow.require('lottie').lottie.getRegisteredAnimations()
+
+        const instance = lottieInstances.find((animation) => {
+          return animation.wrapper === defiLottie
+        })
+
+        if (instance) {
+          return instance
+        }
+        return null
       }
-    },
-    onLeave: () => {
-      clearTimeout(defiInactivityTimeout)
-      window.removeEventListener('scroll', handleDefiScroll)
-    },
-    onEnterBack: (self) => {
-      const rect = sectionDefi.getBoundingClientRect()
-      window.addEventListener('scroll', handleDefiScroll, { passive: true })
-      if (isPinnedAtTop(rect)) {
-        startDefiInactivityTimer(self)
-      }
-    },
-    onLeaveBack: () => {
-      clearTimeout(defiInactivityTimeout)
-      window.removeEventListener('scroll', handleDefiScroll)
-    },
-    onUpdate: (self) => {
-      gsap.to('.selector-overlay', {
-        x: `${(1 - self.progress) * 100}%`,
-        ease: 'none',
-        duration: 0.1,
+    } catch {
+      return null
+    }
+    return null
+  }
+
+  // Fonction pour initialiser et jouer le Lottie
+  const initAndPlayLottie = () => {
+    // Réessayer de récupérer l'instance si elle n'a pas été trouvée avant
+    if (!defiLottieInstance) {
+      defiLottieInstance = getLottieInstance()
+    }
+
+    if (defiLottieInstance) {
+      // Remettre le Lottie au début avant de le lancer
+      defiLottieInstance.goToAndStop(0, true)
+
+      // Supprimer l'ancien listener s'il existe
+      defiLottieInstance.removeEventListener('enterFrame')
+
+      // Écouter la progression du Lottie pour déclencher l'overlay avant la fin
+      defiLottieInstance.addEventListener('enterFrame', (e) => {
+        const frame = e.currentTime
+        const totalFrames = defiLottieInstance.totalFrames
+        const progress = frame / totalFrames
+
+        // Déclencher l'overlay à 80% de l'animation Lottie
+        if (progress >= 0.8 && !window.overlayAnimationStarted) {
+          window.overlayAnimationStarted = true
+          gsap.to('.selector-overlay', {
+            x: '0%',
+            duration: 1,
+            ease: 'power2.inOut',
+            onComplete: () => {
+              window.overlayAnimationStarted = false
+              // Déclencher l'animation du CTA après l'overlay
+              playCTAAnimation()
+            },
+          })
+        }
       })
 
-      // Démarrer le timer si la section est épinglée et qu'on n'est pas en train de scroller
-      const rect = sectionDefi.getBoundingClientRect()
-      if (isPinnedAtTop(rect) && !defiIsScrolling && !defiIsAutoScrolling) {
-        startDefiInactivityTimer(self)
+      defiLottieInstance.play()
+    }
+  }
+
+  // ScrollTrigger pour lancer le lottie à 20% du viewport
+  ScrollTrigger.create({
+    trigger: sectionDefi,
+    start: 'top 40%',
+    end: 'bottom top',
+    toggleClass: 'is-visible',
+    toggleActions: 'restart none none reset',
+    onRefresh: (self) => {
+      if (self.isActive) {
+        initAndPlayLottie()
       }
     },
-  })
-
-  // Cleanup on page unload
-  window.addEventListener('beforeunload', () => {
-    clearTimeout(defiInactivityTimeout)
-    window.removeEventListener('scroll', handleDefiScroll)
+    onToggle: (self) => {
+      if (self.isActive) {
+        initAndPlayLottie()
+      } else {
+        // Réinitialisation complète quand la section sort du viewport
+        if (defiLottieInstance) {
+          defiLottieInstance.stop()
+          defiLottieInstance.goToAndStop(0, true)
+          defiLottieInstance.removeEventListener('enterFrame')
+        }
+        gsap.set('.selector-overlay', { x: '100%' })
+        window.overlayAnimationStarted = false
+        ctaAnimationPlayed = false
+      }
+    },
   })
 }
 
 // --- CTA ANIMATION ---
 
 const cta = document.querySelector('.cta.is-animated')
-if (cta) {
-  const shadow = cta.querySelector('.cta-shadow')
-  gsap.set(shadow, { opacity: 0, width: 0 })
+let ctaAnimationPlayed = false
 
-  const tl = gsap.timeline({ repeat: -1, repeatDelay: 1 })
+function playCTAAnimation() {
+  if (cta && !ctaAnimationPlayed) {
+    const shadow = cta.querySelector('.cta-shadow')
+    gsap.set(shadow, { opacity: 0, width: 0 })
 
-  tl.to(cta, {
-    scale: 0.8,
-    duration: 0.2,
-    ease: 'power1.out',
-  })
-    .to(shadow, {
-      opacity: 0.4,
-      duration: 0.01,
+    const tl = gsap.timeline()
+
+    tl.to(cta, {
+      scale: 0.8,
+      duration: 0.2,
+      ease: 'power1.out',
     })
-    .to(
-      cta,
-      {
-        scale: 1,
-        duration: 0.4,
-        ease: 'power2.out',
-      },
-      '>'
-    )
-    .to(
-      shadow,
-      {
-        width: '100%',
-        opacity: 0,
-        duration: 0.4,
-        ease: 'power2.out',
-      },
-      '<'
-    )
-    .set(shadow, { width: 0 })
+      .to(shadow, {
+        opacity: 0.4,
+        duration: 0.01,
+      })
+      .to(
+        cta,
+        {
+          scale: 1,
+          duration: 0.4,
+          ease: 'power2.out',
+        },
+        '>'
+      )
+      .to(
+        shadow,
+        {
+          width: '100%',
+          opacity: 0,
+          duration: 0.4,
+          ease: 'power2.out',
+        },
+        '<'
+      )
+      .set(shadow, { width: 0 })
+
+    ctaAnimationPlayed = true
+  }
 }

@@ -146,6 +146,19 @@ window.Webflow.push(() => {
   // Ajouter des sources MP4 alternatives aux vidéos WebM
   addFallbackVideoSources()
 
+  const videos = document.querySelectorAll('.swiper-video')
+  const targetDuration = 1.3 // Durée souhaitée en secondes
+
+  videos.forEach((video) => {
+    video.addEventListener('loadedmetadata', () => {
+      const actualDuration = video.duration
+      if (actualDuration > 0) {
+        const speed = actualDuration / targetDuration
+        video.playbackRate = speed
+      }
+    })
+  })
+
   // hero left row
   leftSlider = new Swiper('.hero-animation', {
     modules: [Autoplay],
@@ -153,10 +166,10 @@ window.Webflow.push(() => {
     loop: true,
     centeredSlides: true,
     spaceBetween: 32,
-    speed: 700,
+    speed: 800,
     allowTouchMove: false,
     autoplay: {
-      delay: 3000,
+      delay: 1600,
       reverseDirection: true,
       disableOnInteraction: false,
     },
@@ -215,7 +228,7 @@ window.Webflow.push(() => {
     centeredSlides: true,
     spaceBetween: 32,
     allowTouchMove: false,
-    speed: 700,
+    speed: 800,
     autoplay: false, // Désactiver l'autoplay car il sera contrôlé par le slider gauche
     breakpoints: {
       320: {
@@ -333,7 +346,7 @@ window.addEventListener('resize', () => {
           loop: true,
           centeredSlides: true,
           spaceBetween: 32,
-          speed: 700,
+          speed: 800,
           autoplay: {
             delay: 3000,
             reverseDirection: true,
@@ -380,7 +393,7 @@ window.addEventListener('resize', () => {
           loop: true,
           centeredSlides: true,
           spaceBetween: 32,
-          speed: 700,
+          speed: 800,
           autoplay: false,
           breakpoints: {
             320: {

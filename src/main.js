@@ -1,4 +1,5 @@
 import './styles/style.css'
+import './animations/hero.js'
 import './animations/slider.js'
 import './animations/animations.js'
 import './animations/widgets.js'
