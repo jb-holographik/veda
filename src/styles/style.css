@@ -116,9 +116,13 @@
 
 .marquee-animation-row {
   display: flex;
-  flex-direction: column;
+  /* flex-direction: column; */
   animation: marqueeTop 16s linear infinite;
   /* grid-row-gap: 2rem; */
+}
+
+.marquee-animation-row.pause-scroll {
+  animation-play-state: paused !important;
 }
 
 .marquee-animation.is-2 .marquee-animation-row {
@@ -126,14 +130,7 @@
 }
 
 .is-marquee-slide {
-  height: 15em;
   transition: all 0.5s ease;
-  /* Ajuste selon ton besoin */
-  /*   flex-shrink: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-optional styles */
 }
 
 .is-marquee-slide.is-active {
@@ -166,6 +163,34 @@ optional styles */
 
 
 @media screen and (max-width: 991px) {
+  .marquee-animation-row {
+    width: fit-content;
+  }
+
+  @keyframes marqueeTop {
+    0% {
+      -webkit-transform: translate3d(-50%, 0, 0);
+      transform: translateX(-50%);
+    }
+
+    100% {
+      -webkit-transform: translate3d(0, 0, 0);
+      transform: translateX(0%);
+    }
+  }
+
+  @keyframes marqueeBottom {
+    0% {
+      -webkit-transform: translate3d(0, 0%, 0);
+      transform: translateY(0%);
+    }
+
+    100% {
+      -webkit-transform: translate3d(-50%, 0, 0);
+      transform: translateX(-50%);
+    }
+  }
+
   .hero-content {
     flex-direction: column;
   }

@@ -1,4 +1,3 @@
-// Désactiver l'autoplay des Lottie dans les marquee-animation
 function disableAllLottieAutoplay() {
   const marqueeAnimations = document.querySelectorAll(
     '.marquee-animation.is-animated'
@@ -66,30 +65,63 @@ function createMarkers() {
   const startMarker = document.createElement('div')
   const endMarker = document.createElement('div')
 
-  // Style commun
+  // Style commun de base
   const markerStyle = `
     position: fixed;
-    left: 0;
-    width: 100%;
-    height: 2px;
     background-color: red;
     z-index: 9999;
     pointer-events: none;
   `
 
-  // Configurer le marqueur de début (40%)
-  startMarker.className = 'viewport-marker start-marker'
-  startMarker.style.cssText = markerStyle
-  startMarker.style.top = '40vh'
-  startMarker.innerHTML =
-    '<span style="position: absolute; left: 10px; top: -10px; background: red; color: white; padding: 2px 5px;">40%</span>'
+  // Adapter les marqueurs selon la taille d'écran
+  if (window.innerWidth <= 991) {
+    // Version mobile/tablette (marqueurs verticaux)
+    startMarker.style.cssText = `
+      ${markerStyle}
+      top: 0;
+      left: 40vw;
+      width: 2px;
+      height: 100%;
+    `
 
-  // Configurer le marqueur de fin (75%)
+    endMarker.style.cssText = `
+      ${markerStyle}
+      top: 0;
+      left: 80vw;
+      width: 2px;
+      height: 100%;
+    `
+
+    startMarker.innerHTML =
+      '<span style="position: absolute; left: 10px; top: 10px; background: red; color: white; padding: 2px 5px;">40%</span>'
+    endMarker.innerHTML =
+      '<span style="position: absolute; left: 10px; top: 10px; background: red; color: white; padding: 2px 5px;">80%</span>'
+  } else {
+    // Version desktop (marqueurs horizontaux)
+    startMarker.style.cssText = `
+      ${markerStyle}
+      left: 0;
+      top: 40vh;
+      width: 100%;
+      height: 2px;
+    `
+
+    endMarker.style.cssText = `
+      ${markerStyle}
+      left: 0;
+      top: 75vh;
+      width: 100%;
+      height: 2px;
+    `
+
+    startMarker.innerHTML =
+      '<span style="position: absolute; left: 10px; top: -10px; background: red; color: white; padding: 2px 5px;">40%</span>'
+    endMarker.innerHTML =
+      '<span style="position: absolute; left: 10px; top: -10px; background: red; color: white; padding: 2px 5px;">75%</span>'
+  }
+
+  startMarker.className = 'viewport-marker start-marker'
   endMarker.className = 'viewport-marker end-marker'
-  endMarker.style.cssText = markerStyle
-  endMarker.style.top = '75vh'
-  endMarker.innerHTML =
-    '<span style="position: absolute; left: 10px; top: -10px; background: red; color: white; padding: 2px 5px;">75%</span>'
 
   // Ajouter les marqueurs au body
   document.body.appendChild(startMarker)
@@ -104,23 +136,35 @@ function checkSlidesPosition() {
   const slides = container.querySelectorAll(
     '.marquee-animation-row > .is-marquee-slide'
   )
-  const viewportHeight = window.innerHeight
+
+  // Détecter si on est en mode mobile/tablette
+  const isMobile = window.innerWidth <= 991
+  const viewportDimension = isMobile ? window.innerWidth : window.innerHeight
 
   // Trouver le slide le plus récent dans la zone d'activation
   let activeSlide = null
-  let bestPosition = -Infinity
+  let bestPosition = isMobile ? -Infinity : -Infinity
 
   slides.forEach((slide) => {
     const slideRect = slide.getBoundingClientRect()
-    const slideBottomPosition =
-      ((slideRect.top + slideRect.height) / viewportHeight) * 100
+
+    // Calculer la position relative selon l'orientation
+    const slidePosition = isMobile
+      ? ((slideRect.left + slideRect.width) / viewportDimension) * 100 // Position horizontale
+      : ((slideRect.top + slideRect.height) / viewportDimension) * 100 // Position verticale
+
+    const comparePosition = isMobile ? slideRect.left : slideRect.top
+
+    // Ajuster les seuils selon l'orientation
+    const minThreshold = 40
+    const maxThreshold = isMobile ? 80 : 75
 
     if (
-      slideBottomPosition >= 40 &&
-      slideBottomPosition < 75 &&
-      slideRect.top > bestPosition
+      slidePosition >= minThreshold &&
+      slidePosition < maxThreshold &&
+      comparePosition > bestPosition
     ) {
-      bestPosition = slideRect.top
+      bestPosition = comparePosition
       activeSlide = slide
     }
   })
