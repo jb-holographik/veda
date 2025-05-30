@@ -159,24 +159,19 @@ function recalculateMarqueeAnimations() {
 
 window.addEventListener('orientationchange', () => {
   setTimeout(() => {
-    console.log('[Marquee] Recalcul après orientationchange')
-    recalculateMarqueeAnimations()
+    if (window.innerWidth <= 991) {
+      const marquees = document.querySelectorAll('.marquee-animation')
+      marquees.forEach((original) => {
+        const parent = original.parentElement
+        const clone = original.cloneNode(true)
+        parent.removeChild(original)
+        parent.appendChild(clone)
+        console.log('[Marquee] Reset complet (clone) après orientationchange')
+      })
+    }
   }, 400)
 })
 // Gestionnaire de redimensionnement avec debounce
-let resizeTimeout
-let lastWindowWidth = window.innerWidth
-
-window.addEventListener('resize', () => {
-  clearTimeout(resizeTimeout)
-  resizeTimeout = setTimeout(() => {
-    const currentWidth = window.innerWidth
-    if (lastWindowWidth !== currentWidth) {
-      lastWindowWidth = currentWidth
-      recalculateMarqueeAnimations()
-    }
-  }, 300)
-})
 
 // Attendre que Webflow soit chargé
 window.Webflow = window.Webflow || []
