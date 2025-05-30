@@ -1,3 +1,14 @@
+import gsap from 'gsap'
+import ScrollTrigger from 'gsap/ScrollTrigger'
+import Swiper from 'swiper'
+import { Autoplay } from 'swiper/modules'
+import 'swiper/css'
+
+gsap.registerPlugin(ScrollTrigger)
+
+// Créer les références aux sliders
+let leftSlider, rightSlider
+
 function disableAllLottieAutoplay() {
   const marqueeAnimations = document.querySelectorAll(
     '.marquee-animation.is-animated'
@@ -58,7 +69,7 @@ window.addEventListener('DOMContentLoaded', () => {
 })
 
 // Fonction pour gérer la lecture/pause des médias d'un slide
-function handleSlideMedia(slide, shouldPlay) {
+function handleMedia(slide, shouldPlay) {
   const video = slide.querySelector('video')
 
   if (video) {
@@ -80,7 +91,7 @@ function handleSlideMedia(slide, shouldPlay) {
     } else {
       video.pause()
       video.currentTime = 0
-      video.classList.remove('ready') // remet dans l’état initial
+      video.classList.remove('ready') // remet dans l'état initial
     }
   }
 
@@ -102,78 +113,170 @@ function handleSlideMedia(slide, shouldPlay) {
   }
 }
 
-// Créer et ajouter les marqueurs
-// function createMarkers() {
-//   // Supprimer les marqueurs existants
-//   const existingMarkers = document.querySelectorAll('.viewport-marker')
-//   existingMarkers.forEach((marker) => marker.remove())
+function updateSlideOpacity(swiper) {
+  const slides = swiper.slides
+  const activeIndex = swiper.realIndex
+  const nextIndex = (activeIndex + 1) % swiper.slides.length
 
-//   // Créer les marqueurs
-//   const startMarker = document.createElement('div')
-//   const endMarker = document.createElement('div')
+  slides.forEach((slide) => {
+    const realSlideIndex = Number(slide.dataset.swiperSlideIndex)
+    const content = slide.querySelector('.coin-block')
 
-//   // Style commun de base
-//   const markerStyle = `
-//     position: fixed;
-//     background-color: red;
-//     z-index: 9999;
-//     pointer-events: none;
-//   `
+    if (!content) return // sécurité
 
-//   // Adapter les marqueurs selon la taille d'écran
-//   if (window.innerWidth <= 991) {
-//     // Version mobile/tablette (marqueurs verticaux)
-//     startMarker.style.cssText = `
-//       ${markerStyle}
-//       top: 0;
-//       left: 40vw;
-//       width: 2px;
-//       height: 100%;
-//     `
+    if (realSlideIndex === nextIndex) {
+      content.style.opacity = '0'
+    } else {
+      content.style.opacity = '1'
+    }
+  })
+}
 
-//     endMarker.style.cssText = `
-//       ${markerStyle}
-//       top: 0;
-//       left: 80vw;
-//       width: 2px;
-//       height: 100%;
-//     `
+function updatePrevSlideOpacity(swiper) {
+  const slides = swiper.slides
+  const activeIndex = swiper.realIndex
+  const prevIndex =
+    (activeIndex - 1 + swiper.slides.length) % swiper.slides.length
 
-//     startMarker.innerHTML =
-//       '<span style="position: absolute; left: 10px; top: 10px; background: red; color: white; padding: 2px 5px;">40%</span>'
-//     endMarker.innerHTML =
-//       '<span style="position: absolute; left: 10px; top: 10px; background: red; color: white; padding: 2px 5px;">80%</span>'
-//   } else {
-//     // Version desktop (marqueurs horizontaux)
-//     startMarker.style.cssText = `
-//       ${markerStyle}
-//       left: 0;
-//       top: 40vh;
-//       width: 100%;
-//       height: 2px;
-//     `
+  slides.forEach((slide) => {
+    const realSlideIndex = Number(slide.dataset.swiperSlideIndex)
+    const content = slide.querySelector('.coin-block')
 
-//     endMarker.style.cssText = `
-//       ${markerStyle}
-//       left: 0;
-//       top: 75vh;
-//       width: 100%;
-//       height: 2px;
-//     `
+    if (!content) return
 
-//     startMarker.innerHTML =
-//       '<span style="position: absolute; left: 10px; top: -10px; background: red; color: white; padding: 2px 5px;">40%</span>'
-//     endMarker.innerHTML =
-//       '<span style="position: absolute; left: 10px; top: -10px; background: red; color: white; padding: 2px 5px;">75%</span>'
-//   }
+    if (realSlideIndex === prevIndex) {
+      content.style.opacity = '0'
+    } else {
+      content.style.opacity = '1'
+    }
+  })
+}
 
-//   startMarker.className = 'viewport-marker start-marker'
-//   endMarker.className = 'viewport-marker end-marker'
+// Fonction pour initialiser un slider
+function initializeSlider(selector, options) {
+  return new Swiper(selector, {
+    modules: [Autoplay],
+    slidesPerView: 3,
+    loop: true,
+    centeredSlides: true,
+    spaceBetween: 32,
+    speed: 800,
+    ...options,
+    breakpoints: {
+      320: {
+        direction: 'horizontal',
+        slidesPerView: 2.5,
+        spaceBetween: 16,
+      },
+      768: {
+        direction: 'horizontal',
+        slidesPerView: 3.5,
+      },
+      992: {
+        direction: 'vertical',
+        slidesPerView: 3,
+      },
+    },
+  })
+}
 
-//   // Ajouter les marqueurs au body
-//   document.body.appendChild(startMarker)
-//   document.body.appendChild(endMarker)
-// }
+// Gestionnaire de redimensionnement avec debounce
+let resizeTimeout
+let lastWindowWidth = window.innerWidth
+
+function reinitializeSliders() {
+  if (leftSlider) {
+    const leftCurrentIndex = leftSlider.activeIndex
+    leftSlider.destroy(true, true)
+
+    leftSlider = initializeSlider('.hero-animation', {
+      autoplay: {
+        delay: 1600,
+        reverseDirection: true,
+        disableOnInteraction: false,
+      },
+      initialSlide: leftCurrentIndex,
+      on: {
+        init(swiper) {
+          updateSlideOpacity(swiper)
+          // S'assurer que tous les médias sont en pause
+          swiper.slides.forEach((slide) => {
+            handleMedia(slide, false)
+          })
+          // Activer uniquement le média du slide actif
+          const activeSlide = swiper.slides[swiper.activeIndex]
+          handleMedia(activeSlide, true)
+        },
+        slideChangeTransitionStart(swiper) {
+          updateSlideOpacity(swiper)
+          if (rightSlider && !rightSlider.animating) {
+            rightSlider.slideNext()
+          }
+        },
+        slideChangeTransitionEnd(swiper) {
+          swiper.slides.forEach((slide) => {
+            const isActive = slide.classList.contains('swiper-slide-active')
+            handleMedia(slide, isActive)
+          })
+        },
+      },
+    })
+  }
+
+  if (rightSlider) {
+    const rightCurrentIndex = rightSlider.activeIndex
+    rightSlider.destroy(true, true)
+
+    rightSlider = initializeSlider('.hero-animation-2', {
+      autoplay: false,
+      initialSlide: rightCurrentIndex,
+      on: {
+        init(swiper) {
+          updatePrevSlideOpacity(swiper)
+          // S'assurer que tous les médias sont en pause
+          swiper.slides.forEach((slide) => {
+            handleMedia(slide, false, false, false)
+          })
+        },
+        slideChangeTransitionStart(swiper) {
+          updatePrevSlideOpacity(swiper)
+        },
+        slideChangeTransitionEnd(swiper) {
+          swiper.slides.forEach((slide) => {
+            const isActive = slide.classList.contains('swiper-slide-active')
+            handleMedia(slide, isActive, false, false)
+          })
+        },
+      },
+    })
+  }
+}
+
+// Attendre que Webflow soit chargé
+window.Webflow = window.Webflow || []
+window.Webflow.push(() => {
+  // Désactiver l'autoplay de tous les Lottie immédiatement
+  disableAllLottieAutoplay()
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initPositionChecker)
+  } else {
+    initPositionChecker()
+  }
+})
+
+// Remplacer l'ancien gestionnaire de redimensionnement
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimeout)
+  resizeTimeout = setTimeout(() => {
+    const currentWidth = window.innerWidth
+    // Ne réinitialiser que si la largeur a changé
+    if (lastWindowWidth !== currentWidth) {
+      lastWindowWidth = currentWidth
+      reinitializeSliders()
+    }
+  }, 300)
+})
 
 // Fonction pour vérifier la position des slides
 function checkSlidesPosition() {
@@ -221,12 +324,12 @@ function checkSlidesPosition() {
     if (slide === activeSlide) {
       if (!slide.classList.contains('is-active')) {
         slide.classList.add('is-active')
-        handleSlideMedia(slide, true)
+        handleMedia(slide, true)
       }
     } else {
       if (slide.classList.contains('is-active')) {
         slide.classList.remove('is-active')
-        handleSlideMedia(slide, false)
+        handleMedia(slide, false)
       }
     }
   })
@@ -242,22 +345,3 @@ function initPositionChecker() {
   // createMarkers()
   checkSlidesPosition()
 }
-
-// Attendre que Webflow soit chargé pour initialiser
-window.Webflow = window.Webflow || []
-window.Webflow.push(() => {
-  // Désactiver l'autoplay de tous les Lottie immédiatement
-  disableAllLottieAutoplay()
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initPositionChecker)
-  } else {
-    initPositionChecker()
-  }
-})
-
-// Réinitialiser en cas de redimensionnement
-window.addEventListener('resize', () => {
-  // createMarkers()
-  initPositionChecker()
-})
