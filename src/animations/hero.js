@@ -1,4 +1,3 @@
-/* global Webflow */
 import gsap from 'gsap'
 import ScrollTrigger from 'gsap/ScrollTrigger'
 
@@ -115,6 +114,7 @@ function recalculateMarqueeAnimations() {
   const marquees = document.querySelectorAll('.marquee-animation')
 
   marquees.forEach((marquee) => {
+    const isMobile = window.innerWidth <= 991
     const container = marquee.querySelector('.marquee-animation-row')
     if (!container) return
 
@@ -126,60 +126,30 @@ function recalculateMarqueeAnimations() {
     void container.offsetHeight
 
     const slides = container.querySelectorAll('.is-marquee-slide')
-    const isPortrait = window.innerHeight > window.innerWidth
-    const isMobile = window.innerWidth <= 991
-
-    // Réinitialiser les marges
-    slides.forEach((slide) => {
-      slide.style.marginRight = ''
-      slide.style.marginBottom = ''
-    })
 
     if (isMobile) {
-      if (isPortrait) {
-        // Mode mobile portrait (vertical)
-        let totalHeight = 0
-        slides.forEach((slide) => {
-          const slideStyle = window.getComputedStyle(slide)
-          const marginBottom = parseFloat(slideStyle.marginBottom) || 0
-          totalHeight += slide.offsetHeight + marginBottom
-          slide.style.marginBottom = '2rem'
-        })
+      // Mode mobile (horizontal)
+      let totalWidth = 0
 
-        container.style.flexDirection = 'column'
-        container.style.height = `${totalHeight}px`
-        container.style.width = '100%'
-        console.log(
-          `[Marquee] Mobile portrait: hauteur recalculée → ${totalHeight}px`
-        )
-      } else {
-        // Mode mobile landscape (horizontal)
-        let totalWidth = 0
-        slides.forEach((slide) => {
-          const slideStyle = window.getComputedStyle(slide)
-          const marginRight = parseFloat(slideStyle.marginRight) || 0
-          totalWidth += slide.offsetWidth + marginRight
-          slide.style.marginRight = '2rem'
-        })
+      slides.forEach((slide) => {
+        const slideStyle = window.getComputedStyle(slide)
+        const marginRight = parseFloat(slideStyle.marginRight) || 0
+        totalWidth += slide.offsetWidth + marginRight
+      })
 
-        container.style.flexDirection = 'row'
-        container.style.width = `${totalWidth}px`
-        container.style.height = '100%'
-        console.log(
-          `[Marquee] Mobile landscape: largeur recalculée → ${totalWidth}px`
-        )
-      }
+      container.style.width = `${totalWidth}px`
+      container.style.height = '100%'
+      console.log(`[Marquee] Mobile: largeur recalculée → ${totalWidth}px`)
     } else {
-      // Mode desktop (toujours vertical)
+      // Mode desktop (vertical)
       let totalHeight = 0
+
       slides.forEach((slide) => {
         const slideStyle = window.getComputedStyle(slide)
         const marginBottom = parseFloat(slideStyle.marginBottom) || 0
         totalHeight += slide.offsetHeight + marginBottom
-        slide.style.marginBottom = '2rem'
       })
 
-      container.style.flexDirection = 'column'
       container.style.height = `${totalHeight}px`
       container.style.width = '100%'
       console.log(`[Marquee] Desktop: hauteur recalculée → ${totalHeight}px`)
@@ -187,54 +157,13 @@ function recalculateMarqueeAnimations() {
   })
 }
 
-// Améliorer la gestion du changement d'orientation
-let orientationTimeout
+// Recharger la page lors d'un changement d'orientation
 window.addEventListener('orientationchange', () => {
-  // Nettoyer le timeout existant si nécessaire
-  if (orientationTimeout) clearTimeout(orientationTimeout)
-
-  orientationTimeout = setTimeout(() => {
-    const marquees = document.querySelectorAll('.marquee-animation')
-    marquees.forEach((original) => {
-      // Stopper l'animation en cours
-      const row = original.querySelector('.marquee-animation-row')
-      if (row) {
-        row.style.animationPlayState = 'paused'
-        row.classList.add('pause-scroll')
-      }
-
-      // Cloner et remplacer pour forcer un reset complet
-      const parent = original.parentElement
-      const clone = original.cloneNode(true)
-      parent.removeChild(original)
-      parent.appendChild(clone)
-      console.log('[Marquee] Reset complet (clone) après orientationchange')
-
-      // Re-init Webflow IX
-      if (window.Webflow && Webflow.require) {
-        const ix2 = Webflow.require('ix2')
-        if (ix2 && ix2.init) {
-          ix2.init()
-          console.log(
-            '[Marquee] Webflow interactions réinitialisées après clone'
-          )
-        }
-      }
-
-      // Recalculer les dimensions et redémarrer les animations
-      requestAnimationFrame(() => {
-        recalculateMarqueeAnimations()
-        const newRow = clone.querySelector('.marquee-animation-row')
-        if (newRow) {
-          newRow.classList.remove('pause-scroll')
-          newRow.style.animationPlayState = 'running'
-        }
-      })
-
-      // Redémarrer le checker de position
-      initPositionChecker()
-    })
-  }, 400) // Attendre que le changement d'orientation soit terminé
+  // Attendre que le changement d'orientation soit terminé
+  setTimeout(() => {
+    console.log('[Marquee] Rechargement après changement orientation')
+    window.location.reload()
+  }, 50)
 })
 
 // Gestionnaire de redimensionnement avec debounce

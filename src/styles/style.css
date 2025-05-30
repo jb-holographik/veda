@@ -106,16 +106,19 @@
 }
 
 /* Marquee animation */
+
 .marquee-animation {
   height: 100%;
+  /* ou une hauteur fixe */
   overflow: hidden;
   position: relative;
 }
 
 .marquee-animation-row {
   display: flex;
-  flex-direction: column;
+  /* flex-direction: column; */
   animation: marqueeTop 16s linear infinite;
+  /* grid-row-gap: 2rem; */
 }
 
 .marquee-animation-row.pause-scroll {
@@ -126,113 +129,49 @@
   animation: marqueeBottom 16s linear infinite;
 }
 
-/* Animations desktop (vertical) */
+.is-marquee-slide {
+  transition: all 0.5s ease;
+}
+
+.is-marquee-slide.is-active {
+  border: 1px solid var(--purple);
+}
+
+.swiper-video {
+  opacity: 1;
+  transition: none;
+}
+
+.swiper-video.ready {
+  transition: opacity 0.3s ease-in;
+}
+
 @keyframes marqueeTop {
   0% {
+    -webkit-transform: translate3d(0, -50%, 0);
     transform: translateY(-50%);
   }
 
   100% {
+    -webkit-transform: translate3d(0, -0%, 0);
     transform: translateY(0%);
   }
 }
 
 @keyframes marqueeBottom {
   0% {
+    -webkit-transform: translate3d(0, 0%, 0);
     transform: translateY(0%);
   }
 
   100% {
+    -webkit-transform: translate3d(0, -50%, 0);
     transform: translateY(-50%);
   }
 }
 
-/* Mobile landscape */
-@media screen and (max-width: 991px) and (orientation: landscape) {
-  .marquee-animation-row {
-    flex-direction: row;
-    width: fit-content;
-  }
 
-  @keyframes marqueeTop {
-    0% {
-      transform: translateX(-50%);
-    }
-
-    100% {
-      transform: translateX(0%);
-    }
-  }
-
-  @keyframes marqueeBottom {
-    0% {
-      transform: translateX(0%);
-    }
-
-    100% {
-      transform: translateX(-50%);
-    }
-  }
-
-  .is-marquee-slide {
-    margin-right: 2rem;
-    margin-bottom: 0;
-  }
-}
-
-/* Mobile portrait */
-@media screen and (max-width: 991px) and (orientation: portrait) {
-  .marquee-animation-row {
-    flex-direction: column;
-    height: fit-content;
-  }
-
-  @keyframes marqueeTop {
-    0% {
-      transform: translateY(-50%);
-    }
-
-    100% {
-      transform: translateY(0%);
-    }
-  }
-
-  @keyframes marqueeBottom {
-    0% {
-      transform: translateY(0%);
-    }
-
-    100% {
-      transform: translateY(-50%);
-    }
-  }
-
-  .is-marquee-slide {
-    margin-bottom: 2rem;
-    margin-right: 0;
-  }
-}
-
-@media screen and (max-width: 767px) {
-
-  .hero-animation.swiper,
-  .hero-animation-2.swiper {
-    padding: 0 16px;
-  }
-
-  .hero-animation.swiper {
-    padding-left: 3em;
-    order: 2;
-  }
-
-  .hero-animation-2.swiper {
-    padding-right: 3em;
-    order: 1;
-  }
-}
-
-@media screen and (max-width: 568px) {
-
+@media screen and (max-width: 991px) {
   .marquee-animation-row {
     width: fit-content;
   }
@@ -259,5 +198,83 @@
       -webkit-transform: translate3d(-50%, 0, 0);
       transform: translateX(-50%);
     }
+  }
+
+  .hero-content {
+    flex-direction: column;
+  }
+
+  .animation-wrapper {
+    width: 100%;
+    height: 100%;
+  }
+
+  .hero-animation.swiper {
+    padding-left: 10.5em;
+    order: 2;
+  }
+
+  .hero-animation-2.swiper {
+    padding-right: 10.5em;
+    order: 1;
+  }
+
+  .hero-content_left,
+  .hero-content_right {
+    width: 100%;
+    position: relative;
+    /* Donner un espace vertical suffisant pour les sliders */
+  }
+
+  .animation-row.swiper-wrapper {
+    flex-direction: row !important;
+  }
+
+  .coin-block {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .slider-overlay {
+    background-image: linear-gradient(-90deg, white, var(--white) 27%, #fff0 103%);
+    width: 20%;
+    height: 100%;
+    right: auto;
+    left: 0;
+    position: absolute;
+  }
+
+  .slider-overlay.is-bottom {
+    background-image: linear-gradient(90deg, white, var(--white) 27%, #fff0 103%);
+    width: 20%;
+    height: 100%;
+    right: 0;
+    left: auto;
+  }
+
+  .hero-animation.swiper-slide,
+  .hero-animation-2.swiper-slide {
+    opacity: 1;
+  }
+}
+
+@media screen and (max-width: 767px) {
+
+  .hero-animation.swiper,
+  .hero-animation-2.swiper {
+    padding: 0 16px;
+  }
+
+  .hero-animation.swiper {
+    padding-left: 3em;
+    order: 2;
+  }
+
+  .hero-animation-2.swiper {
+    padding-right: 3em;
+    order: 1;
   }
 }
