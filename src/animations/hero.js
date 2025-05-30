@@ -118,42 +118,51 @@ function recalculateMarqueeAnimations() {
     const container = marquee.querySelector('.marquee-animation-row')
     if (!container) return
 
-    // Réinitialiser les styles pour un nouveau calcul
+    // Réinitialiser les styles
     container.style.width = ''
     container.style.height = ''
 
+    // Force un reflow pour fiabiliser les dimensions
+    void container.offsetHeight
+
+    const slides = container.querySelectorAll('.is-marquee-slide')
+
     if (isMobile) {
-      // Mode mobile : largeur adaptée au contenu, hauteur 100%
-      const slides = container.querySelectorAll('.is-marquee-slide')
+      // Mode mobile (horizontal)
       let totalWidth = 0
 
       slides.forEach((slide) => {
-        totalWidth += slide.offsetWidth
-        // Ajouter la marge si elle existe
-        const margin = parseInt(window.getComputedStyle(slide).marginRight)
-        if (!isNaN(margin)) totalWidth += margin
+        const slideStyle = window.getComputedStyle(slide)
+        const marginRight = parseFloat(slideStyle.marginRight) || 0
+        totalWidth += slide.offsetWidth + marginRight
       })
 
       container.style.width = `${totalWidth}px`
       container.style.height = '100%'
+      console.log(`[Marquee] Mobile: largeur recalculée → ${totalWidth}px`)
     } else {
-      // Mode desktop : largeur 100%, hauteur adaptée au contenu
-      container.style.width = '100%'
-      const slides = container.querySelectorAll('.is-marquee-slide')
+      // Mode desktop (vertical)
       let totalHeight = 0
 
       slides.forEach((slide) => {
-        totalHeight += slide.offsetHeight
-        // Ajouter la marge si elle existe
-        const margin = parseInt(window.getComputedStyle(slide).marginBottom)
-        if (!isNaN(margin)) totalHeight += margin
+        const slideStyle = window.getComputedStyle(slide)
+        const marginBottom = parseFloat(slideStyle.marginBottom) || 0
+        totalHeight += slide.offsetHeight + marginBottom
       })
 
       container.style.height = `${totalHeight}px`
+      container.style.width = '100%'
+      console.log(`[Marquee] Desktop: hauteur recalculée → ${totalHeight}px`)
     }
   })
 }
 
+window.addEventListener('orientationchange', () => {
+  setTimeout(() => {
+    console.log('[Marquee] Recalcul après orientationchange')
+    recalculateMarqueeAnimations()
+  }, 400)
+})
 // Gestionnaire de redimensionnement avec debounce
 let resizeTimeout
 let lastWindowWidth = window.innerWidth
