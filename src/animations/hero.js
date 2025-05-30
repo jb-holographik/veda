@@ -10,7 +10,6 @@ function disableAllLottieAutoplay() {
   marqueeAnimations.forEach((container) => {
     const lotties = container.querySelectorAll('[data-animation-type="lottie"]')
     lotties.forEach((lottie) => {
-      // Désactiver tous les attributs d'autoplay
       lottie.setAttribute('data-autoplay', '0')
       lottie.setAttribute('data-is-ix2-target', '0')
       lottie.setAttribute('data-autoplay-on-scroll', '0')
@@ -29,7 +28,6 @@ function disableAllLottieAutoplay() {
   })
 }
 
-// Détecter Safari desktop
 function isSafariDesktop() {
   const ua = navigator.userAgent
   const isSafari = /^((?!chrome|android).)*safari/i.test(ua)
@@ -38,7 +36,6 @@ function isSafariDesktop() {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-  // Ne pas exécuter sur Safari desktop
   if (isSafariDesktop()) {
     console.log(
       '[MediaLoader] Safari desktop détecté → pas de gestion du preload'
@@ -73,7 +70,6 @@ window.addEventListener('DOMContentLoaded', () => {
           { once: true }
         )
       } else {
-        // Trop de vidéos en cours → réessayer plus tard
         console.log(
           `[MediaLoader] Vidéo ordre ${video.dataset.loadOrder} en attente (trop de chargements)`
         )
@@ -101,12 +97,10 @@ window.addEventListener('DOMContentLoaded', () => {
   })
 })
 
-// Fonction pour gérer la lecture/pause des médias d'un slide
 function handleMedia(slide, shouldPlay) {
   const video = slide.querySelector('video')
 
   if (video) {
-    // Configuration de base pour la lecture automatique
     video.setAttribute('playsinline', '')
     video.setAttribute('webkit-playsinline', '')
     video.setAttribute('muted', '')
@@ -114,7 +108,6 @@ function handleMedia(slide, shouldPlay) {
     video.defaultMuted = true
     video.volume = 0
 
-    // Ajouter listener canplay (fade-in visuel) une seule fois
     if (!video.dataset.listenerAdded) {
       video.addEventListener(
         'canplay',
@@ -127,67 +120,41 @@ function handleMedia(slide, shouldPlay) {
     }
 
     if (shouldPlay) {
-      // Fonction de lecture sécurisée
-      const safePlay = async () => {
-        try {
-          // Charger la vidéo si ce n'est pas déjà fait
-          if (video.readyState === 0) {
-            video.load()
-          }
-
-          // S'assurer que la vidéo est bien configurée
-          video.muted = true
-          video.volume = 0
-
-          // Remettre au début si nécessaire
-          if (video.currentTime > 0) {
-            video.currentTime = 0
-          }
-
-          // Tenter la lecture
-          await video.play()
-          console.log('Lecture vidéo démarrée')
-        } catch (error) {
-          console.warn('Erreur lecture vidéo:', error)
-
-          // Dernière tentative avec un petit délai
-          setTimeout(() => {
-            video.muted = true
-            video.volume = 0
-            video.currentTime = 0
-            video.play().catch((e) => console.warn('Échec final:', e))
-          }, 100)
+      if (video.readyState >= 3) {
+        video.currentTime = 0
+        video.play().catch((e) => console.warn('Erreur lecture (ready):', e))
+      } else {
+        const onCanPlay = () => {
+          video.removeEventListener('canplaythrough', onCanPlay)
+          video.currentTime = 0
+          video
+            .play()
+            .catch((e) => console.warn('Erreur lecture (canplaythrough):', e))
         }
+        video.addEventListener('canplaythrough', onCanPlay, { once: true })
+        video.load()
       }
-
-      // Lancer la lecture de manière sécurisée
-      safePlay()
     } else {
-      // Arrêt de la vidéo
       try {
         video.pause()
         video.currentTime = 0
         video.classList.remove('ready')
-      } catch (error) {
-        console.warn('Erreur arrêt vidéo:', error)
+      } catch (e) {
+        console.warn('Erreur arrêt vidéo:', e)
       }
     }
   }
 
-  // Gérer Lottie indépendamment
   const lottie = slide.querySelector('[data-animation-type="lottie"]')
-  if (lottie && window.Webflow && window.Webflow.require) {
+  if (lottie && window.Webflow?.require) {
     const lottieInstance = window.Webflow.require('lottie')
       .lottie.getRegisteredAnimations()
       .find((animation) => animation.wrapper === lottie)
 
     if (lottieInstance) {
-      if (shouldPlay) {
-        lottieInstance.goToAndPlay(0)
-      } else {
-        lottieInstance.pause()
-        lottieInstance.goToAndStop(0)
-      }
+      shouldPlay
+        ? lottieInstance.goToAndPlay(0)
+        : (lottieInstance.pause(), lottieInstance.goToAndStop(0))
     }
   }
 }
