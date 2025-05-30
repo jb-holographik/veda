@@ -138,12 +138,12 @@
 }
 
 .swiper-video {
-  opacity: 0;
-  /* transition: opacity 0.3s ease-in; */
+  opacity: 1;
+  transition: none;
 }
 
 .swiper-video.ready {
-  opacity: 1;
+  transition: opacity 0.3s ease-in;
 }
 
 @keyframes marqueeTop {

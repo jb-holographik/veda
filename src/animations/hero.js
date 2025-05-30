@@ -29,12 +29,12 @@ function handleSlideMedia(slide, shouldPlay) {
   const video = slide.querySelector('video')
 
   if (video) {
-    // Ajouter un fade-in une seule fois (à la première lecture)
+    // Ajouter listener canplay une seule fois
     if (!video.dataset.listenerAdded) {
       video.addEventListener(
         'canplay',
         () => {
-          video.classList.add('ready')
+          video.classList.add('ready') // déclenche le fade-in
         },
         { once: true }
       )
@@ -47,7 +47,7 @@ function handleSlideMedia(slide, shouldPlay) {
     } else {
       video.pause()
       video.currentTime = 0
-      video.classList.remove('ready') // reset fade-in si nécessaire
+      video.classList.remove('ready') // remet dans l’état initial
     }
   }
 
