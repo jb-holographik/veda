@@ -137,6 +137,15 @@
   border: 1px solid var(--purple);
 }
 
+.swiper-video {
+  opacity: 0;
+  /* transition: opacity 0.3s ease-in; */
+}
+
+.swiper-video.ready {
+  opacity: 1;
+}
+
 @keyframes marqueeTop {
   0% {
     -webkit-transform: translate3d(0, -50%, 0);

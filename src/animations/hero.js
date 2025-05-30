@@ -26,18 +26,32 @@ function disableAllLottieAutoplay() {
 
 // Fonction pour gérer la lecture/pause des médias d'un slide
 function handleSlideMedia(slide, shouldPlay) {
-  // Gérer la vidéo si présente
   const video = slide.querySelector('video')
+
   if (video) {
+    // Ajouter un fade-in une seule fois (à la première lecture)
+    if (!video.dataset.listenerAdded) {
+      video.addEventListener(
+        'canplay',
+        () => {
+          video.classList.add('ready')
+        },
+        { once: true }
+      )
+
+      video.dataset.listenerAdded = 'true'
+    }
+
     if (shouldPlay) {
       video.play().catch((e) => console.log('Erreur lecture vidéo:', e))
     } else {
       video.pause()
       video.currentTime = 0
+      video.classList.remove('ready') // reset fade-in si nécessaire
     }
   }
 
-  // Gérer l'animation Lottie si présente
+  // Gérer Lottie
   const lottie = slide.querySelector('[data-animation-type="lottie"]')
   if (lottie && window.Webflow && window.Webflow.require) {
     const lottieInstance = window.Webflow.require('lottie')

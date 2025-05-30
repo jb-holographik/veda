@@ -204,6 +204,10 @@ blockquote {
   display: flex;
 }
 
+.section_hero.hidden {
+  display: none;
+}
+
 .hero-content {
   flex-flow: row;
   flex: 1;
@@ -657,7 +661,7 @@ blockquote {
 }
 
 .selector-animation {
-  width: 50%;
+  width: 40%;
   position: absolute;
 }
 
@@ -1626,6 +1630,8 @@ blockquote {
   background-color: var(--white);
   border: 1px dashed #03030b1f;
   border-radius: 2.5rem;
+  height: 10em;
+  margin-bottom: 2rem;
   overflow: hidden;
 }
 
@@ -1970,9 +1976,23 @@ blockquote {
     margin-top: 0;
   }
 
+  .marquee-animation.is-animated {
+    margin-top: 0;
+    margin-left: 0;
+  }
+
+  .marquee-animation-row {
+    flex-flow: row;
+  }
+
   .marquee-animation-row.swiper-wrapper {
     flex-flow: row;
     width: 100%;
+  }
+
+  .is-marquee-slide {
+    margin-bottom: 0;
+    margin-right: 2rem;
   }
 }
 
@@ -2305,6 +2325,11 @@ blockquote {
 
   .page-header {
     width: 100%;
+  }
+
+  .is-marquee-slide {
+    height: 7em;
+    margin-right: 1rem;
   }
 }
 
