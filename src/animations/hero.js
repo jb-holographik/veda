@@ -106,73 +106,71 @@ function handleMedia(slide, shouldPlay) {
   const video = slide.querySelector('video')
 
   if (video) {
-    // S'assurer que la vidéo est configurée pour l'autoplay sur Safari
+    // Configuration de base pour la lecture automatique
     video.setAttribute('playsinline', '')
     video.setAttribute('webkit-playsinline', '')
     video.setAttribute('muted', '')
-    video.muted = true // Double sécurité pour Safari
+    video.muted = true
+    video.defaultMuted = true
+    video.volume = 0
 
     // Ajouter listener canplay (fade-in visuel) une seule fois
     if (!video.dataset.listenerAdded) {
       video.addEventListener(
         'canplay',
         () => {
-          video.classList.add('ready') // déclenche le fade-in
+          video.classList.add('ready')
         },
         { once: true }
       )
-
       video.dataset.listenerAdded = 'true'
     }
 
     if (shouldPlay) {
-      // Lire immédiatement si la vidéo est prête
-      if (video.readyState >= 3) {
-        // S'assurer que la vidéo est muette avant de lancer la lecture
-        video.muted = true
-        video
-          .play()
-          .then(() => {
-            console.log('Lecture vidéo démarrée avec succès')
-          })
-          .catch((e) => {
-            console.warn('Erreur lecture vidéo (déjà prête):', e)
-            // Tentative de récupération pour Safari
-            video.muted = true
-            video.currentTime = 0
-            video
-              .play()
-              .catch((e) => console.warn('Échec seconde tentative:', e))
-          })
-      } else {
-        // Sinon attendre qu'elle soit prête
-        const onCanPlay = () => {
-          video.removeEventListener('canplay', onCanPlay)
-          // S'assurer que la vidéo est muette avant de lancer la lecture
+      // Fonction de lecture sécurisée
+      const safePlay = async () => {
+        try {
+          // Charger la vidéo si ce n'est pas déjà fait
+          if (video.readyState === 0) {
+            video.load()
+          }
+
+          // S'assurer que la vidéo est bien configurée
           video.muted = true
-          video
-            .play()
-            .then(() => {
-              console.log('Lecture vidéo démarrée après canplay')
-            })
-            .catch((e) => {
-              console.warn('Erreur lecture vidéo (après canplay):', e)
-              // Tentative de récupération pour Safari
-              video.muted = true
-              video.currentTime = 0
-              video
-                .play()
-                .catch((e) =>
-                  console.warn('Échec seconde tentative après canplay:', e)
-                )
-            })
+          video.volume = 0
+
+          // Remettre au début si nécessaire
+          if (video.currentTime > 0) {
+            video.currentTime = 0
+          }
+
+          // Tenter la lecture
+          await video.play()
+          console.log('Lecture vidéo démarrée')
+        } catch (error) {
+          console.warn('Erreur lecture vidéo:', error)
+
+          // Dernière tentative avec un petit délai
+          setTimeout(() => {
+            video.muted = true
+            video.volume = 0
+            video.currentTime = 0
+            video.play().catch((e) => console.warn('Échec final:', e))
+          }, 100)
         }
-        video.addEventListener('canplay', onCanPlay)
       }
+
+      // Lancer la lecture de manière sécurisée
+      safePlay()
     } else {
-      video.pause()
-      video.currentTime = 0
-      video.classList.remove('ready') // Réinitialise le fade-in
+      // Arrêt de la vidéo
+      try {
+        video.pause()
+        video.currentTime = 0
+        video.classList.remove('ready')
+      } catch (error) {
+        console.warn('Erreur arrêt vidéo:', error)
+      }
     }
   }
 
