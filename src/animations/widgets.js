@@ -8,10 +8,8 @@ let widgetsTextSwiper = null
 
 function initWidgetsSwiper() {
   const container = document.querySelector('.visuals')
-  console.log('Container widgets-visuals:', container)
   if (!container) return null
 
-  // Détruire l'instance Swiper existante si elle existe
   if (widgetsSwiper) {
     widgetsSwiper.destroy(true, true)
   }
@@ -36,10 +34,8 @@ function initWidgetsSwiper() {
 
 function initWidgetsTextSwiper() {
   const container = document.querySelector('.widgets-text-wrapper')
-  console.log('Container widgets-text-wrapper:', container)
   if (!container) return null
 
-  // Détruire l'instance Swiper existante si elle existe
   if (widgetsTextSwiper) {
     widgetsTextSwiper.destroy(true, true)
   }

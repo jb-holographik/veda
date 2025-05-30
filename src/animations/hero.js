@@ -37,15 +37,10 @@ function isSafariDesktop() {
 
 window.addEventListener('DOMContentLoaded', () => {
   if (isSafariDesktop()) {
-    console.log(
-      '[MediaLoader] Safari desktop détecté → pas de gestion du preload'
-    )
     return
   }
 
   const videos = Array.from(document.querySelectorAll('video.swiper-video'))
-  console.log(`[MediaLoader] ${videos.length} vidéos trouvées`)
-
   const MAX_CONCURRENT_LOADS = 3
   let concurrentLoads = 0
 
@@ -55,24 +50,15 @@ window.addEventListener('DOMContentLoaded', () => {
         concurrentLoads++
         video.setAttribute('preload', 'auto')
         video.load()
-        console.log(
-          `[MediaLoader] Vidéo ordre ${video.dataset.loadOrder} → preload lancé`
-        )
 
         video.addEventListener(
           'canplaythrough',
           () => {
             concurrentLoads--
-            console.log(
-              `[MediaLoader] Vidéo ordre ${video.dataset.loadOrder} → preload terminé`
-            )
           },
           { once: true }
         )
       } else {
-        console.log(
-          `[MediaLoader] Vidéo ordre ${video.dataset.loadOrder} en attente (trop de chargements)`
-        )
         loadVideoWithDelay(video, delay + 300)
       }
     }, delay)
@@ -87,9 +73,6 @@ window.addEventListener('DOMContentLoaded', () => {
     if (loadOrder === 1 || loadOrder === 2) {
       video.setAttribute('preload', 'auto')
       video.load()
-      console.log(
-        `[MediaLoader] Vidéo ordre ${loadOrder} → preload immédiat (prioritaire)`
-      )
     } else {
       const delay = 500 + index * 100
       loadVideoWithDelay(video, delay)
@@ -101,8 +84,6 @@ function handleMedia(slide, shouldPlay) {
   const video = slide.querySelector('video')
 
   if (video) {
-    // Appliquer les attributs requis pour Safari iOS autoplay
-    // video.setAttribute('autoplay', '')
     video.setAttribute('muted', '')
     video.setAttribute('playsinline', '')
     video.setAttribute('webkit-playsinline', '')
@@ -110,12 +91,11 @@ function handleMedia(slide, shouldPlay) {
     video.defaultMuted = true
     video.volume = 0
 
-    // Ajouter un écouteur pour le fade-in à la première lecture
     if (!video.dataset.listenerAdded) {
       video.addEventListener(
         'canplay',
         () => {
-          video.classList.add('ready') // pour déclencher un effet CSS éventuel
+          video.classList.add('ready')
         },
         { once: true }
       )
@@ -125,11 +105,7 @@ function handleMedia(slide, shouldPlay) {
     if (shouldPlay) {
       const tryPlay = () => {
         video.currentTime = 0
-        video
-          .play()
-          .catch((e) =>
-            console.warn('[handleMedia] Échec de lecture (fallback):', e)
-          )
+        video.play()
       }
 
       if (video.readyState >= 3) {
@@ -140,7 +116,7 @@ function handleMedia(slide, shouldPlay) {
           tryPlay()
         }
         video.addEventListener('canplaythrough', onCanPlay, { once: true })
-        video.load() // déclenche le téléchargement si nécessaire
+        video.load()
       }
     } else {
       try {
@@ -148,12 +124,11 @@ function handleMedia(slide, shouldPlay) {
         video.currentTime = 0
         video.classList.remove('ready')
       } catch (e) {
-        console.warn('[handleMedia] Erreur à l’arrêt de la vidéo :', e)
+        // Silently handle error
       }
     }
   }
 
-  // Gestion de Lottie
   const lottie = slide.querySelector('[data-animation-type="lottie"]')
   if (lottie && window.Webflow?.require) {
     const lottieInstance = window.Webflow.require('lottie')
@@ -171,9 +146,6 @@ function handleMedia(slide, shouldPlay) {
   }
 }
 
-// Fonction pour initialiser un slider
-
-// Fonction pour recalculer les dimensions des marquee-animations
 function recalculateMarqueeAnimations() {
   const marquees = document.querySelectorAll('.marquee-animation')
 
@@ -182,17 +154,14 @@ function recalculateMarqueeAnimations() {
     const container = marquee.querySelector('.marquee-animation-row')
     if (!container) return
 
-    // Réinitialiser les styles
     container.style.width = ''
     container.style.height = ''
 
-    // Force un reflow pour fiabiliser les dimensions
     void container.offsetHeight
 
     const slides = container.querySelectorAll('.is-marquee-slide')
 
     if (isMobile) {
-      // Mode mobile (horizontal)
       let totalWidth = 0
 
       slides.forEach((slide) => {
@@ -203,9 +172,7 @@ function recalculateMarqueeAnimations() {
 
       container.style.width = `${totalWidth}px`
       container.style.height = '100%'
-      console.log(`[Marquee] Mobile: largeur recalculée → ${totalWidth}px`)
     } else {
-      // Mode desktop (vertical)
       let totalHeight = 0
 
       slides.forEach((slide) => {
@@ -216,21 +183,16 @@ function recalculateMarqueeAnimations() {
 
       container.style.height = `${totalHeight}px`
       container.style.width = '100%'
-      console.log(`[Marquee] Desktop: hauteur recalculée → ${totalHeight}px`)
     }
   })
 }
 
-// Recharger la page lors d'un changement d'orientation
 window.addEventListener('orientationchange', () => {
-  // Attendre que le changement d'orientation soit terminé
   setTimeout(() => {
-    console.log('[Marquee] Rechargement après changement orientation')
     window.location.reload()
   }, 50)
 })
 
-// Gestionnaire de redimensionnement avec debounce
 let resizeTimeout
 let wasDesktop = window.innerWidth > 991
 
@@ -240,38 +202,30 @@ window.addEventListener('resize', () => {
     const currentWidth = window.innerWidth
     const isNowDesktop = currentWidth > 991
 
-    // Détecter le changement de breakpoint desktop/tablette
     if (wasDesktop !== isNowDesktop) {
-      console.log(
-        '[Marquee] Changement desktop/tablette détecté, rechargement...'
-      )
       window.location.reload()
       return
     }
 
-    // Mise à jour pour la prochaine vérification
     wasDesktop = isNowDesktop
   }, 300)
 })
 
-// Attendre que Webflow soit chargé
 window.Webflow = window.Webflow || []
 window.Webflow.push(() => {
-  // Désactiver l'autoplay de tous les Lottie immédiatement
   disableAllLottieAutoplay()
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
       initPositionChecker()
-      recalculateMarqueeAnimations() // Calcul initial
+      recalculateMarqueeAnimations()
     })
   } else {
     initPositionChecker()
-    recalculateMarqueeAnimations() // Calcul initial
+    recalculateMarqueeAnimations()
   }
 })
 
-// Fonction pour vérifier la position des slides
 function checkSlidesPosition() {
   const container = document.querySelector('.marquee-animation.is-animated')
   if (!container) return
@@ -280,25 +234,21 @@ function checkSlidesPosition() {
     '.marquee-animation-row > .is-marquee-slide'
   )
 
-  // Détecter si on est en mode mobile/tablette
   const isMobile = window.innerWidth <= 991
   const viewportDimension = isMobile ? window.innerWidth : window.innerHeight
 
-  // Trouver le slide le plus récent dans la zone d'activation
   let activeSlide = null
   let bestPosition = isMobile ? -Infinity : -Infinity
 
   slides.forEach((slide) => {
     const slideRect = slide.getBoundingClientRect()
 
-    // Calculer la position relative selon l'orientation
     const slidePosition = isMobile
-      ? ((slideRect.left + slideRect.width) / viewportDimension) * 100 // Position horizontale
-      : ((slideRect.top + slideRect.height) / viewportDimension) * 100 // Position verticale
+      ? ((slideRect.left + slideRect.width) / viewportDimension) * 100
+      : ((slideRect.top + slideRect.height) / viewportDimension) * 100
 
     const comparePosition = isMobile ? slideRect.left : slideRect.top
 
-    // Ajuster les seuils selon l'orientation
     const minThreshold = 40
     const maxThreshold = isMobile ? 80 : 75
 
@@ -312,7 +262,6 @@ function checkSlidesPosition() {
     }
   })
 
-  // Mettre à jour les classes et gérer les médias
   slides.forEach((slide) => {
     if (slide === activeSlide) {
       if (!slide.classList.contains('is-active')) {
@@ -327,14 +276,10 @@ function checkSlidesPosition() {
     }
   })
 
-  // Continuer la boucle d'animation
   requestAnimationFrame(checkSlidesPosition)
 }
 
-// Démarrer la vérification des positions
 function initPositionChecker() {
-  // Désactiver l'autoplay de tous les Lottie au démarrage
   disableAllLottieAutoplay()
-  // createMarkers()
   checkSlidesPosition()
 }

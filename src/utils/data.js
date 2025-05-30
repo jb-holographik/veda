@@ -39,7 +39,14 @@ export async function fetchAndDisplayTVL() {
       }
     }
   } catch (error) {
-    console.error('Erreur lors du chargement du TVL depuis DeFiLlama:', error)
+    // En cas d'erreur, afficher une valeur par défaut
+    const firstBlock = document.querySelector('.data_block')
+    if (firstBlock) {
+      const contentEl = firstBlock.querySelector('.data-content')
+      if (contentEl) {
+        contentEl.textContent = '$0'
+      }
+    }
   }
 }
 
