@@ -90,7 +90,7 @@ function handleMedia(slide, shouldPlay) {
   const video = slide.querySelector('video')
 
   if (video) {
-    // Ajouter listener canplay une seule fois
+    // Ajouter listener canplay (fade-in visuel) une seule fois
     if (!video.dataset.listenerAdded) {
       video.addEventListener(
         'canplay',
@@ -99,20 +99,35 @@ function handleMedia(slide, shouldPlay) {
         },
         { once: true }
       )
-
       video.dataset.listenerAdded = 'true'
     }
 
     if (shouldPlay) {
-      video.play().catch((e) => console.log('Erreur lecture vidéo:', e))
+      // Lire immédiatement si la vidéo est prête
+      if (video.readyState >= 3) {
+        video
+          .play()
+          .catch((e) => console.warn('Erreur lecture vidéo (déjà prête):', e))
+      } else {
+        // Sinon attendre qu'elle soit prête
+        const onCanPlay = () => {
+          video.removeEventListener('canplay', onCanPlay)
+          video
+            .play()
+            .catch((e) =>
+              console.warn('Erreur lecture vidéo (après canplay):', e)
+            )
+        }
+        video.addEventListener('canplay', onCanPlay)
+      }
     } else {
       video.pause()
       video.currentTime = 0
-      video.classList.remove('ready') // remet dans l'état initial
+      video.classList.remove('ready') // Réinitialise le fade-in
     }
   }
 
-  // Gérer Lottie
+  // Gérer Lottie indépendamment
   const lottie = slide.querySelector('[data-animation-type="lottie"]')
   if (lottie && window.Webflow && window.Webflow.require) {
     const lottieInstance = window.Webflow.require('lottie')
