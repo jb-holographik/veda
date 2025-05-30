@@ -1,3 +1,4 @@
+/* global Webflow */
 import gsap from 'gsap'
 import ScrollTrigger from 'gsap/ScrollTrigger'
 
@@ -167,6 +168,20 @@ window.addEventListener('orientationchange', () => {
         parent.removeChild(original)
         parent.appendChild(clone)
         console.log('[Marquee] Reset complet (clone) après orientationchange')
+
+        // Re-init Webflow IX
+        if (window.Webflow && Webflow.require) {
+          const ix2 = Webflow.require('ix2')
+          if (ix2 && ix2.init) {
+            ix2.init()
+            console.log(
+              '[Marquee] Webflow interactions réinitialisées après clone'
+            )
+          }
+        }
+
+        // Redémarrer le checker de position
+        initPositionChecker()
       })
     }
   }, 400)
