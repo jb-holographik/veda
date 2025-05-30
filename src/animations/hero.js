@@ -146,46 +146,46 @@ function handleMedia(slide, shouldPlay) {
   }
 }
 
-function recalculateMarqueeAnimations() {
-  const marquees = document.querySelectorAll('.marquee-animation')
+// function recalculateMarqueeAnimations() {
+//   const marquees = document.querySelectorAll('.marquee-animation')
 
-  marquees.forEach((marquee) => {
-    const isMobile = window.innerWidth <= 991
-    const container = marquee.querySelector('.marquee-animation-row')
-    if (!container) return
+//   marquees.forEach((marquee) => {
+//     const isMobile = window.innerWidth <= 991
+//     const container = marquee.querySelector('.marquee-animation-row')
+//     if (!container) return
 
-    container.style.width = ''
-    container.style.height = ''
+//     container.style.width = ''
+//     container.style.height = ''
 
-    void container.offsetHeight
+//     void container.offsetHeight
 
-    const slides = container.querySelectorAll('.is-marquee-slide')
+//     const slides = container.querySelectorAll('.is-marquee-slide')
 
-    if (isMobile) {
-      let totalWidth = 0
+//     if (isMobile) {
+//       let totalWidth = 0
 
-      slides.forEach((slide) => {
-        const slideStyle = window.getComputedStyle(slide)
-        const marginRight = parseFloat(slideStyle.marginRight) || 0
-        totalWidth += slide.offsetWidth + marginRight
-      })
+//       slides.forEach((slide) => {
+//         const slideStyle = window.getComputedStyle(slide)
+//         const marginRight = parseFloat(slideStyle.marginRight) || 0
+//         totalWidth += slide.offsetWidth + marginRight
+//       })
 
-      container.style.width = `${totalWidth}px`
-      container.style.height = '100%'
-    } else {
-      let totalHeight = 0
+//       container.style.width = `${totalWidth}px`
+//       container.style.height = '100%'
+//     } else {
+//       let totalHeight = 0
 
-      slides.forEach((slide) => {
-        const slideStyle = window.getComputedStyle(slide)
-        const marginBottom = parseFloat(slideStyle.marginBottom) || 0
-        totalHeight += slide.offsetHeight + marginBottom
-      })
+//       slides.forEach((slide) => {
+//         const slideStyle = window.getComputedStyle(slide)
+//         const marginBottom = parseFloat(slideStyle.marginBottom) || 0
+//         totalHeight += slide.offsetHeight + marginBottom
+//       })
 
-      container.style.height = `${totalHeight}px`
-      container.style.width = '100%'
-    }
-  })
-}
+//       container.style.height = `${totalHeight}px`
+//       container.style.width = '100%'
+//     }
+//   })
+// }
 
 window.addEventListener('orientationchange', () => {
   setTimeout(() => {
@@ -218,11 +218,11 @@ window.Webflow.push(() => {
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
       initPositionChecker()
-      recalculateMarqueeAnimations()
+      // recalculateMarqueeAnimations()
     })
   } else {
     initPositionChecker()
-    recalculateMarqueeAnimations()
+    // recalculateMarqueeAnimations()
   }
 })
 
