@@ -278,3 +278,34 @@
     order: 1;
   }
 }
+
+@media screen and (max-width: 568px) {
+
+  .marquee-animation-row {
+    width: fit-content;
+  }
+
+  @keyframes marqueeTop {
+    0% {
+      -webkit-transform: translate3d(-50%, 0, 0);
+      transform: translateX(-50%);
+    }
+
+    100% {
+      -webkit-transform: translate3d(0, 0, 0);
+      transform: translateX(0%);
+    }
+  }
+
+  @keyframes marqueeBottom {
+    0% {
+      -webkit-transform: translate3d(0, 0%, 0);
+      transform: translateY(0%);
+    }
+
+    100% {
+      -webkit-transform: translate3d(-50%, 0, 0);
+      transform: translateX(-50%);
+    }
+  }
+}
