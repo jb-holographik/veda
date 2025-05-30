@@ -101,18 +101,21 @@ function handleMedia(slide, shouldPlay) {
   const video = slide.querySelector('video')
 
   if (video) {
+    // Appliquer les attributs requis pour Safari iOS autoplay
+    video.setAttribute('autoplay', '')
+    video.setAttribute('muted', '')
     video.setAttribute('playsinline', '')
     video.setAttribute('webkit-playsinline', '')
-    video.setAttribute('muted', '')
     video.muted = true
     video.defaultMuted = true
     video.volume = 0
 
+    // Ajouter un écouteur pour le fade-in à la première lecture
     if (!video.dataset.listenerAdded) {
       video.addEventListener(
         'canplay',
         () => {
-          video.classList.add('ready')
+          video.classList.add('ready') // pour déclencher un effet CSS éventuel
         },
         { once: true }
       )
@@ -120,19 +123,24 @@ function handleMedia(slide, shouldPlay) {
     }
 
     if (shouldPlay) {
-      if (video.readyState >= 3) {
+      const tryPlay = () => {
         video.currentTime = 0
-        video.play().catch((e) => console.warn('Erreur lecture (ready):', e))
+        video
+          .play()
+          .catch((e) =>
+            console.warn('[handleMedia] Échec de lecture (fallback):', e)
+          )
+      }
+
+      if (video.readyState >= 3) {
+        tryPlay()
       } else {
         const onCanPlay = () => {
           video.removeEventListener('canplaythrough', onCanPlay)
-          video.currentTime = 0
-          video
-            .play()
-            .catch((e) => console.warn('Erreur lecture (canplaythrough):', e))
+          tryPlay()
         }
         video.addEventListener('canplaythrough', onCanPlay, { once: true })
-        video.load()
+        video.load() // déclenche le téléchargement si nécessaire
       }
     } else {
       try {
@@ -140,11 +148,12 @@ function handleMedia(slide, shouldPlay) {
         video.currentTime = 0
         video.classList.remove('ready')
       } catch (e) {
-        console.warn('Erreur arrêt vidéo:', e)
+        console.warn('[handleMedia] Erreur à l’arrêt de la vidéo :', e)
       }
     }
   }
 
+  // Gestion de Lottie
   const lottie = slide.querySelector('[data-animation-type="lottie"]')
   if (lottie && window.Webflow?.require) {
     const lottieInstance = window.Webflow.require('lottie')
@@ -152,9 +161,12 @@ function handleMedia(slide, shouldPlay) {
       .find((animation) => animation.wrapper === lottie)
 
     if (lottieInstance) {
-      shouldPlay
-        ? lottieInstance.goToAndPlay(0)
-        : (lottieInstance.pause(), lottieInstance.goToAndStop(0))
+      if (shouldPlay) {
+        lottieInstance.goToAndPlay(0)
+      } else {
+        lottieInstance.pause()
+        lottieInstance.goToAndStop(0)
+      }
     }
   }
 }

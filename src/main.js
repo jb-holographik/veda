@@ -1,6 +1,7 @@
 import './styles/style.css'
 import './animations/hero.js'
-import './animations/slider.js'
+// import './animations/slider.js'
+import './animations/marquee.js'
 import './animations/animations.js'
 import './animations/widgets.js'
 import './animations/cards.js'
