@@ -29,13 +29,25 @@ function disableAllLottieAutoplay() {
   })
 }
 
+// Détecter Safari desktop
+function isSafariDesktop() {
+  const ua = navigator.userAgent
+  const isSafari = /^((?!chrome|android).)*safari/i.test(ua)
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(ua)
+  return isSafari && !isMobile
+}
+
 window.addEventListener('DOMContentLoaded', () => {
+  // Ne pas exécuter sur Safari desktop
+  if (isSafariDesktop()) {
+    console.log(
+      '[MediaLoader] Safari desktop détecté → pas de gestion du preload'
+    )
+    return
+  }
+
   const videos = Array.from(document.querySelectorAll('video.swiper-video'))
   console.log(`[MediaLoader] ${videos.length} vidéos trouvées`)
-
-  const sortedVideos = videos
-    .filter((v) => v.dataset.loadOrder)
-    .sort((a, b) => Number(a.dataset.loadOrder) - Number(b.dataset.loadOrder))
 
   const MAX_CONCURRENT_LOADS = 3
   let concurrentLoads = 0
@@ -69,6 +81,10 @@ window.addEventListener('DOMContentLoaded', () => {
       }
     }, delay)
   }
+
+  const sortedVideos = videos
+    .filter((v) => v.dataset.loadOrder)
+    .sort((a, b) => Number(a.dataset.loadOrder) - Number(b.dataset.loadOrder))
 
   sortedVideos.forEach((video, index) => {
     const loadOrder = Number(video.dataset.loadOrder || 0)
