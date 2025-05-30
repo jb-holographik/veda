@@ -33,31 +33,54 @@ window.addEventListener('DOMContentLoaded', () => {
   const videos = Array.from(document.querySelectorAll('video.swiper-video'))
   console.log(`[MediaLoader] ${videos.length} vidéos trouvées`)
 
-  // Trier les vidéos par ordre croissant selon data-load-order
   const sortedVideos = videos
     .filter((v) => v.dataset.loadOrder)
     .sort((a, b) => Number(a.dataset.loadOrder) - Number(b.dataset.loadOrder))
 
-  sortedVideos.forEach((video, index) => {
-    const loadOrder = video.dataset.loadOrder || '??'
+  const MAX_CONCURRENT_LOADS = 3
+  let concurrentLoads = 0
 
-    if (index < 2) {
-      video.setAttribute('preload', 'auto')
-      video.load()
-      console.log(
-        `[MediaLoader] Vidéo ordre ${loadOrder} → preload immédiat (auto)`
-      )
-    } else {
-      // Délai progressif pour étaler les chargements
-      const delay = 500 + index * 100
-
-      setTimeout(() => {
+  function loadVideoWithDelay(video, delay) {
+    setTimeout(() => {
+      if (concurrentLoads < MAX_CONCURRENT_LOADS) {
+        concurrentLoads++
         video.setAttribute('preload', 'auto')
         video.load()
         console.log(
-          `[MediaLoader] Vidéo ordre ${loadOrder} → preload différé après ${delay}ms`
+          `[MediaLoader] Vidéo ordre ${video.dataset.loadOrder} → preload lancé`
         )
-      }, delay)
+
+        video.addEventListener(
+          'canplaythrough',
+          () => {
+            concurrentLoads--
+            console.log(
+              `[MediaLoader] Vidéo ordre ${video.dataset.loadOrder} → preload terminé`
+            )
+          },
+          { once: true }
+        )
+      } else {
+        // Trop de vidéos en cours → réessayer plus tard
+        console.log(
+          `[MediaLoader] Vidéo ordre ${video.dataset.loadOrder} en attente (trop de chargements)`
+        )
+        loadVideoWithDelay(video, delay + 300)
+      }
+    }, delay)
+  }
+
+  sortedVideos.forEach((video, index) => {
+    const loadOrder = Number(video.dataset.loadOrder || 0)
+    if (loadOrder === 1 || loadOrder === 2) {
+      video.setAttribute('preload', 'auto')
+      video.load()
+      console.log(
+        `[MediaLoader] Vidéo ordre ${loadOrder} → preload immédiat (prioritaire)`
+      )
+    } else {
+      const delay = 500 + index * 100
+      loadVideoWithDelay(video, delay)
     }
   })
 })
