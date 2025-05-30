@@ -102,7 +102,7 @@ function handleMedia(slide, shouldPlay) {
 
   if (video) {
     // Appliquer les attributs requis pour Safari iOS autoplay
-    video.setAttribute('autoplay', '')
+    // video.setAttribute('autoplay', '')
     video.setAttribute('muted', '')
     video.setAttribute('playsinline', '')
     video.setAttribute('webkit-playsinline', '')
