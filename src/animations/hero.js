@@ -24,6 +24,39 @@ function disableAllLottieAutoplay() {
   })
 }
 
+window.addEventListener('DOMContentLoaded', () => {
+  const videos = Array.from(document.querySelectorAll('video.swiper-video'))
+  console.log(`[MediaLoader] ${videos.length} vidéos trouvées`)
+
+  // Trier les vidéos par ordre croissant selon data-load-order
+  const sortedVideos = videos
+    .filter((v) => v.dataset.loadOrder)
+    .sort((a, b) => Number(a.dataset.loadOrder) - Number(b.dataset.loadOrder))
+
+  sortedVideos.forEach((video, index) => {
+    const loadOrder = video.dataset.loadOrder || '??'
+
+    if (index < 2) {
+      video.setAttribute('preload', 'auto')
+      video.load()
+      console.log(
+        `[MediaLoader] Vidéo ordre ${loadOrder} → preload immédiat (auto)`
+      )
+    } else {
+      // Délai progressif pour étaler les chargements
+      const delay = 500 + index * 100
+
+      setTimeout(() => {
+        video.setAttribute('preload', 'auto')
+        video.load()
+        console.log(
+          `[MediaLoader] Vidéo ordre ${loadOrder} → preload différé après ${delay}ms`
+        )
+      }, delay)
+    }
+  })
+})
+
 // Fonction pour gérer la lecture/pause des médias d'un slide
 function handleSlideMedia(slide, shouldPlay) {
   const video = slide.querySelector('video')
