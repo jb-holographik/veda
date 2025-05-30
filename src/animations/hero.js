@@ -1,8 +1,3 @@
-import gsap from 'gsap'
-import ScrollTrigger from 'gsap/ScrollTrigger'
-
-gsap.registerPlugin(ScrollTrigger)
-
 function disableAllLottieAutoplay() {
   const marqueeAnimations = document.querySelectorAll(
     '.marquee-animation.is-animated'
@@ -29,84 +24,45 @@ function disableAllLottieAutoplay() {
   })
 }
 
-// Détecter Safari desktop
-function isSafariDesktop() {
-  const ua = navigator.userAgent
-  const isSafari = /^((?!chrome|android).)*safari/i.test(ua)
-  const isMobile = /iPhone|iPad|iPod|Android/i.test(ua)
-  return isSafari && !isMobile
-}
-
 window.addEventListener('DOMContentLoaded', () => {
-  // Ne pas exécuter sur Safari desktop
-  if (isSafariDesktop()) {
-    console.log(
-      '[MediaLoader] Safari desktop détecté → pas de gestion du preload'
-    )
-    return
-  }
-
   const videos = Array.from(document.querySelectorAll('video.swiper-video'))
   console.log(`[MediaLoader] ${videos.length} vidéos trouvées`)
 
-  const MAX_CONCURRENT_LOADS = 3
-  let concurrentLoads = 0
-
-  function loadVideoWithDelay(video, delay) {
-    setTimeout(() => {
-      if (concurrentLoads < MAX_CONCURRENT_LOADS) {
-        concurrentLoads++
-        video.setAttribute('preload', 'auto')
-        video.load()
-        console.log(
-          `[MediaLoader] Vidéo ordre ${video.dataset.loadOrder} → preload lancé`
-        )
-
-        video.addEventListener(
-          'canplaythrough',
-          () => {
-            concurrentLoads--
-            console.log(
-              `[MediaLoader] Vidéo ordre ${video.dataset.loadOrder} → preload terminé`
-            )
-          },
-          { once: true }
-        )
-      } else {
-        // Trop de vidéos en cours → réessayer plus tard
-        console.log(
-          `[MediaLoader] Vidéo ordre ${video.dataset.loadOrder} en attente (trop de chargements)`
-        )
-        loadVideoWithDelay(video, delay + 300)
-      }
-    }, delay)
-  }
-
+  // Trier les vidéos par ordre croissant selon data-load-order
   const sortedVideos = videos
     .filter((v) => v.dataset.loadOrder)
     .sort((a, b) => Number(a.dataset.loadOrder) - Number(b.dataset.loadOrder))
 
   sortedVideos.forEach((video, index) => {
-    const loadOrder = Number(video.dataset.loadOrder || 0)
-    if (loadOrder === 1 || loadOrder === 2) {
+    const loadOrder = video.dataset.loadOrder || '??'
+
+    if (index < 2) {
       video.setAttribute('preload', 'auto')
       video.load()
       console.log(
-        `[MediaLoader] Vidéo ordre ${loadOrder} → preload immédiat (prioritaire)`
+        `[MediaLoader] Vidéo ordre ${loadOrder} → preload immédiat (auto)`
       )
     } else {
+      // Délai progressif pour étaler les chargements
       const delay = 500 + index * 100
-      loadVideoWithDelay(video, delay)
+
+      setTimeout(() => {
+        video.setAttribute('preload', 'auto')
+        video.load()
+        console.log(
+          `[MediaLoader] Vidéo ordre ${loadOrder} → preload différé après ${delay}ms`
+        )
+      }, delay)
     }
   })
 })
 
 // Fonction pour gérer la lecture/pause des médias d'un slide
-function handleMedia(slide, shouldPlay) {
+function handleSlideMedia(slide, shouldPlay) {
   const video = slide.querySelector('video')
 
   if (video) {
-    // Ajouter listener canplay (fade-in visuel) une seule fois
+    // Ajouter listener canplay une seule fois
     if (!video.dataset.listenerAdded) {
       video.addEventListener(
         'canplay',
@@ -115,35 +71,20 @@ function handleMedia(slide, shouldPlay) {
         },
         { once: true }
       )
+
       video.dataset.listenerAdded = 'true'
     }
 
     if (shouldPlay) {
-      // Lire immédiatement si la vidéo est prête
-      if (video.readyState >= 3) {
-        video
-          .play()
-          .catch((e) => console.warn('Erreur lecture vidéo (déjà prête):', e))
-      } else {
-        // Sinon attendre qu'elle soit prête
-        const onCanPlay = () => {
-          video.removeEventListener('canplay', onCanPlay)
-          video
-            .play()
-            .catch((e) =>
-              console.warn('Erreur lecture vidéo (après canplay):', e)
-            )
-        }
-        video.addEventListener('canplay', onCanPlay)
-      }
+      video.play().catch((e) => console.log('Erreur lecture vidéo:', e))
     } else {
       video.pause()
       video.currentTime = 0
-      video.classList.remove('ready') // Réinitialise le fade-in
+      video.classList.remove('ready') // remet dans l’état initial
     }
   }
 
-  // Gérer Lottie indépendamment
+  // Gérer Lottie
   const lottie = slide.querySelector('[data-animation-type="lottie"]')
   if (lottie && window.Webflow && window.Webflow.require) {
     const lottieInstance = window.Webflow.require('lottie')
@@ -161,105 +102,78 @@ function handleMedia(slide, shouldPlay) {
   }
 }
 
-// Fonction pour initialiser un slider
+// Créer et ajouter les marqueurs
+// function createMarkers() {
+//   // Supprimer les marqueurs existants
+//   const existingMarkers = document.querySelectorAll('.viewport-marker')
+//   existingMarkers.forEach((marker) => marker.remove())
 
-// Fonction pour recalculer les dimensions des marquee-animations
-function recalculateMarqueeAnimations() {
-  const marquees = document.querySelectorAll('.marquee-animation')
+//   // Créer les marqueurs
+//   const startMarker = document.createElement('div')
+//   const endMarker = document.createElement('div')
 
-  marquees.forEach((marquee) => {
-    const isMobile = window.innerWidth <= 991
-    const container = marquee.querySelector('.marquee-animation-row')
-    if (!container) return
+//   // Style commun de base
+//   const markerStyle = `
+//     position: fixed;
+//     background-color: red;
+//     z-index: 9999;
+//     pointer-events: none;
+//   `
 
-    // Réinitialiser les styles
-    container.style.width = ''
-    container.style.height = ''
+//   // Adapter les marqueurs selon la taille d'écran
+//   if (window.innerWidth <= 991) {
+//     // Version mobile/tablette (marqueurs verticaux)
+//     startMarker.style.cssText = `
+//       ${markerStyle}
+//       top: 0;
+//       left: 40vw;
+//       width: 2px;
+//       height: 100%;
+//     `
 
-    // Force un reflow pour fiabiliser les dimensions
-    void container.offsetHeight
+//     endMarker.style.cssText = `
+//       ${markerStyle}
+//       top: 0;
+//       left: 80vw;
+//       width: 2px;
+//       height: 100%;
+//     `
 
-    const slides = container.querySelectorAll('.is-marquee-slide')
+//     startMarker.innerHTML =
+//       '<span style="position: absolute; left: 10px; top: 10px; background: red; color: white; padding: 2px 5px;">40%</span>'
+//     endMarker.innerHTML =
+//       '<span style="position: absolute; left: 10px; top: 10px; background: red; color: white; padding: 2px 5px;">80%</span>'
+//   } else {
+//     // Version desktop (marqueurs horizontaux)
+//     startMarker.style.cssText = `
+//       ${markerStyle}
+//       left: 0;
+//       top: 40vh;
+//       width: 100%;
+//       height: 2px;
+//     `
 
-    if (isMobile) {
-      // Mode mobile (horizontal)
-      let totalWidth = 0
+//     endMarker.style.cssText = `
+//       ${markerStyle}
+//       left: 0;
+//       top: 75vh;
+//       width: 100%;
+//       height: 2px;
+//     `
 
-      slides.forEach((slide) => {
-        const slideStyle = window.getComputedStyle(slide)
-        const marginRight = parseFloat(slideStyle.marginRight) || 0
-        totalWidth += slide.offsetWidth + marginRight
-      })
+//     startMarker.innerHTML =
+//       '<span style="position: absolute; left: 10px; top: -10px; background: red; color: white; padding: 2px 5px;">40%</span>'
+//     endMarker.innerHTML =
+//       '<span style="position: absolute; left: 10px; top: -10px; background: red; color: white; padding: 2px 5px;">75%</span>'
+//   }
 
-      container.style.width = `${totalWidth}px`
-      container.style.height = '100%'
-      console.log(`[Marquee] Mobile: largeur recalculée → ${totalWidth}px`)
-    } else {
-      // Mode desktop (vertical)
-      let totalHeight = 0
+//   startMarker.className = 'viewport-marker start-marker'
+//   endMarker.className = 'viewport-marker end-marker'
 
-      slides.forEach((slide) => {
-        const slideStyle = window.getComputedStyle(slide)
-        const marginBottom = parseFloat(slideStyle.marginBottom) || 0
-        totalHeight += slide.offsetHeight + marginBottom
-      })
-
-      container.style.height = `${totalHeight}px`
-      container.style.width = '100%'
-      console.log(`[Marquee] Desktop: hauteur recalculée → ${totalHeight}px`)
-    }
-  })
-}
-
-// Recharger la page lors d'un changement d'orientation
-window.addEventListener('orientationchange', () => {
-  // Attendre que le changement d'orientation soit terminé
-  setTimeout(() => {
-    console.log('[Marquee] Rechargement après changement orientation')
-    window.location.reload()
-  }, 50)
-})
-
-// Gestionnaire de redimensionnement avec debounce
-let resizeTimeout
-let wasDesktop = window.innerWidth > 991
-
-window.addEventListener('resize', () => {
-  clearTimeout(resizeTimeout)
-  resizeTimeout = setTimeout(() => {
-    const currentWidth = window.innerWidth
-    const isNowDesktop = currentWidth > 991
-
-    // Détecter le changement de breakpoint desktop/tablette
-    if (wasDesktop !== isNowDesktop) {
-      console.log(
-        '[Marquee] Changement desktop/tablette détecté, rechargement...'
-      )
-      window.location.reload()
-      return
-    }
-
-    // Mise à jour pour la prochaine vérification
-    wasDesktop = isNowDesktop
-  }, 300)
-})
-
-// Attendre que Webflow soit chargé
-window.Webflow = window.Webflow || []
-window.Webflow.push(() => {
-  // Désactiver l'autoplay de tous les Lottie immédiatement
-  disableAllLottieAutoplay()
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      initPositionChecker()
-      recalculateMarqueeAnimations() // Calcul initial
-    })
-  } else {
-    initPositionChecker()
-    recalculateMarqueeAnimations() // Calcul initial
-  }
-})
+//   // Ajouter les marqueurs au body
+//   document.body.appendChild(startMarker)
+//   document.body.appendChild(endMarker)
+// }
 
 // Fonction pour vérifier la position des slides
 function checkSlidesPosition() {
@@ -307,12 +221,12 @@ function checkSlidesPosition() {
     if (slide === activeSlide) {
       if (!slide.classList.contains('is-active')) {
         slide.classList.add('is-active')
-        handleMedia(slide, true)
+        handleSlideMedia(slide, true)
       }
     } else {
       if (slide.classList.contains('is-active')) {
         slide.classList.remove('is-active')
-        handleMedia(slide, false)
+        handleSlideMedia(slide, false)
       }
     }
   })
@@ -328,3 +242,22 @@ function initPositionChecker() {
   // createMarkers()
   checkSlidesPosition()
 }
+
+// Attendre que Webflow soit chargé pour initialiser
+window.Webflow = window.Webflow || []
+window.Webflow.push(() => {
+  // Désactiver l'autoplay de tous les Lottie immédiatement
+  disableAllLottieAutoplay()
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initPositionChecker)
+  } else {
+    initPositionChecker()
+  }
+})
+
+// Réinitialiser en cas de redimensionnement
+window.addEventListener('resize', () => {
+  // createMarkers()
+  initPositionChecker()
+})
