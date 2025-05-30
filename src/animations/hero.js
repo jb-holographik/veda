@@ -106,6 +106,12 @@ function handleMedia(slide, shouldPlay) {
   const video = slide.querySelector('video')
 
   if (video) {
+    // S'assurer que la vidéo est configurée pour l'autoplay sur Safari
+    video.setAttribute('playsinline', '')
+    video.setAttribute('webkit-playsinline', '')
+    video.setAttribute('muted', '')
+    video.muted = true // Double sécurité pour Safari
+
     // Ajouter listener canplay (fade-in visuel) une seule fois
     if (!video.dataset.listenerAdded) {
       video.addEventListener(
@@ -115,24 +121,51 @@ function handleMedia(slide, shouldPlay) {
         },
         { once: true }
       )
+
       video.dataset.listenerAdded = 'true'
     }
 
     if (shouldPlay) {
       // Lire immédiatement si la vidéo est prête
       if (video.readyState >= 3) {
+        // S'assurer que la vidéo est muette avant de lancer la lecture
+        video.muted = true
         video
           .play()
-          .catch((e) => console.warn('Erreur lecture vidéo (déjà prête):', e))
+          .then(() => {
+            console.log('Lecture vidéo démarrée avec succès')
+          })
+          .catch((e) => {
+            console.warn('Erreur lecture vidéo (déjà prête):', e)
+            // Tentative de récupération pour Safari
+            video.muted = true
+            video.currentTime = 0
+            video
+              .play()
+              .catch((e) => console.warn('Échec seconde tentative:', e))
+          })
       } else {
         // Sinon attendre qu'elle soit prête
         const onCanPlay = () => {
           video.removeEventListener('canplay', onCanPlay)
+          // S'assurer que la vidéo est muette avant de lancer la lecture
+          video.muted = true
           video
             .play()
-            .catch((e) =>
+            .then(() => {
+              console.log('Lecture vidéo démarrée après canplay')
+            })
+            .catch((e) => {
               console.warn('Erreur lecture vidéo (après canplay):', e)
-            )
+              // Tentative de récupération pour Safari
+              video.muted = true
+              video.currentTime = 0
+              video
+                .play()
+                .catch((e) =>
+                  console.warn('Échec seconde tentative après canplay:', e)
+                )
+            })
         }
         video.addEventListener('canplay', onCanPlay)
       }
