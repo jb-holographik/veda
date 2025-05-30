@@ -1,13 +1,7 @@
 import gsap from 'gsap'
 import ScrollTrigger from 'gsap/ScrollTrigger'
-import Swiper from 'swiper'
-import { Autoplay } from 'swiper/modules'
-import 'swiper/css'
 
 gsap.registerPlugin(ScrollTrigger)
-
-// Créer les références aux sliders
-let leftSlider, rightSlider
 
 function disableAllLottieAutoplay() {
   const marqueeAnimations = document.querySelectorAll(
@@ -113,70 +107,50 @@ function handleMedia(slide, shouldPlay) {
   }
 }
 
-function updateSlideOpacity(swiper) {
-  const slides = swiper.slides
-  const activeIndex = swiper.realIndex
-  const nextIndex = (activeIndex + 1) % swiper.slides.length
-
-  slides.forEach((slide) => {
-    const realSlideIndex = Number(slide.dataset.swiperSlideIndex)
-    const content = slide.querySelector('.coin-block')
-
-    if (!content) return // sécurité
-
-    if (realSlideIndex === nextIndex) {
-      content.style.opacity = '0'
-    } else {
-      content.style.opacity = '1'
-    }
-  })
-}
-
-function updatePrevSlideOpacity(swiper) {
-  const slides = swiper.slides
-  const activeIndex = swiper.realIndex
-  const prevIndex =
-    (activeIndex - 1 + swiper.slides.length) % swiper.slides.length
-
-  slides.forEach((slide) => {
-    const realSlideIndex = Number(slide.dataset.swiperSlideIndex)
-    const content = slide.querySelector('.coin-block')
-
-    if (!content) return
-
-    if (realSlideIndex === prevIndex) {
-      content.style.opacity = '0'
-    } else {
-      content.style.opacity = '1'
-    }
-  })
-}
-
 // Fonction pour initialiser un slider
-function initializeSlider(selector, options) {
-  return new Swiper(selector, {
-    modules: [Autoplay],
-    slidesPerView: 3,
-    loop: true,
-    centeredSlides: true,
-    spaceBetween: 32,
-    speed: 800,
-    ...options,
-    breakpoints: {
-      320: {
-        direction: 'horizontal',
-        slidesPerView: 2.5,
-        spaceBetween: 16,
-      },
-      768: {
-        direction: 'horizontal',
-        slidesPerView: 3.5,
-      },
-      992: {
-        direction: 'vertical',
-        slidesPerView: 3,
-      },
-    },
+
+// Fonction pour recalculer les dimensions des marquee-animations
+function recalculateMarqueeAnimations() {
+  const marquees = document.querySelectorAll('.marquee-animation')
+
+  marquees.forEach((marquee) => {
+    const isMobile = window.innerWidth <= 991
+    const container = marquee.querySelector('.marquee-animation-row')
+    if (!container) return
+
+    // Réinitialiser les styles pour un nouveau calcul
+    container.style.width = ''
+    container.style.height = ''
+
+    if (isMobile) {
+      // Mode mobile : largeur adaptée au contenu, hauteur 100%
+      const slides = container.querySelectorAll('.is-marquee-slide')
+      let totalWidth = 0
+
+      slides.forEach((slide) => {
+        totalWidth += slide.offsetWidth
+        // Ajouter la marge si elle existe
+        const margin = parseInt(window.getComputedStyle(slide).marginRight)
+        if (!isNaN(margin)) totalWidth += margin
+      })
+
+      container.style.width = `${totalWidth}px`
+      container.style.height = '100%'
+    } else {
+      // Mode desktop : largeur 100%, hauteur adaptée au contenu
+      container.style.width = '100%'
+      const slides = container.querySelectorAll('.is-marquee-slide')
+      let totalHeight = 0
+
+      slides.forEach((slide) => {
+        totalHeight += slide.offsetHeight
+        // Ajouter la marge si elle existe
+        const margin = parseInt(window.getComputedStyle(slide).marginBottom)
+        if (!isNaN(margin)) totalHeight += margin
+      })
+
+      container.style.height = `${totalHeight}px`
+    }
   })
 }
 
@@ -184,73 +158,16 @@ function initializeSlider(selector, options) {
 let resizeTimeout
 let lastWindowWidth = window.innerWidth
 
-function reinitializeSliders() {
-  if (leftSlider) {
-    const leftCurrentIndex = leftSlider.activeIndex
-    leftSlider.destroy(true, true)
-
-    leftSlider = initializeSlider('.hero-animation', {
-      autoplay: {
-        delay: 1600,
-        reverseDirection: true,
-        disableOnInteraction: false,
-      },
-      initialSlide: leftCurrentIndex,
-      on: {
-        init(swiper) {
-          updateSlideOpacity(swiper)
-          // S'assurer que tous les médias sont en pause
-          swiper.slides.forEach((slide) => {
-            handleMedia(slide, false)
-          })
-          // Activer uniquement le média du slide actif
-          const activeSlide = swiper.slides[swiper.activeIndex]
-          handleMedia(activeSlide, true)
-        },
-        slideChangeTransitionStart(swiper) {
-          updateSlideOpacity(swiper)
-          if (rightSlider && !rightSlider.animating) {
-            rightSlider.slideNext()
-          }
-        },
-        slideChangeTransitionEnd(swiper) {
-          swiper.slides.forEach((slide) => {
-            const isActive = slide.classList.contains('swiper-slide-active')
-            handleMedia(slide, isActive)
-          })
-        },
-      },
-    })
-  }
-
-  if (rightSlider) {
-    const rightCurrentIndex = rightSlider.activeIndex
-    rightSlider.destroy(true, true)
-
-    rightSlider = initializeSlider('.hero-animation-2', {
-      autoplay: false,
-      initialSlide: rightCurrentIndex,
-      on: {
-        init(swiper) {
-          updatePrevSlideOpacity(swiper)
-          // S'assurer que tous les médias sont en pause
-          swiper.slides.forEach((slide) => {
-            handleMedia(slide, false, false, false)
-          })
-        },
-        slideChangeTransitionStart(swiper) {
-          updatePrevSlideOpacity(swiper)
-        },
-        slideChangeTransitionEnd(swiper) {
-          swiper.slides.forEach((slide) => {
-            const isActive = slide.classList.contains('swiper-slide-active')
-            handleMedia(slide, isActive, false, false)
-          })
-        },
-      },
-    })
-  }
-}
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimeout)
+  resizeTimeout = setTimeout(() => {
+    const currentWidth = window.innerWidth
+    if (lastWindowWidth !== currentWidth) {
+      lastWindowWidth = currentWidth
+      recalculateMarqueeAnimations()
+    }
+  }, 300)
+})
 
 // Attendre que Webflow soit chargé
 window.Webflow = window.Webflow || []
@@ -259,23 +176,14 @@ window.Webflow.push(() => {
   disableAllLottieAutoplay()
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initPositionChecker)
+    document.addEventListener('DOMContentLoaded', () => {
+      initPositionChecker()
+      recalculateMarqueeAnimations() // Calcul initial
+    })
   } else {
     initPositionChecker()
+    recalculateMarqueeAnimations() // Calcul initial
   }
-})
-
-// Remplacer l'ancien gestionnaire de redimensionnement
-window.addEventListener('resize', () => {
-  clearTimeout(resizeTimeout)
-  resizeTimeout = setTimeout(() => {
-    const currentWidth = window.innerWidth
-    // Ne réinitialiser que si la largeur a changé
-    if (lastWindowWidth !== currentWidth) {
-      lastWindowWidth = currentWidth
-      reinitializeSliders()
-    }
-  }, 300)
 })
 
 // Fonction pour vérifier la position des slides
