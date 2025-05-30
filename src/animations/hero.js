@@ -167,6 +167,28 @@ window.addEventListener('orientationchange', () => {
 })
 
 // Gestionnaire de redimensionnement avec debounce
+let resizeTimeout
+let wasDesktop = window.innerWidth > 991
+
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimeout)
+  resizeTimeout = setTimeout(() => {
+    const currentWidth = window.innerWidth
+    const isNowDesktop = currentWidth > 991
+
+    // Détecter le changement de breakpoint desktop/tablette
+    if (wasDesktop !== isNowDesktop) {
+      console.log(
+        '[Marquee] Changement desktop/tablette détecté, rechargement...'
+      )
+      window.location.reload()
+      return
+    }
+
+    // Mise à jour pour la prochaine vérification
+    wasDesktop = isNowDesktop
+  }, 300)
+})
 
 // Attendre que Webflow soit chargé
 window.Webflow = window.Webflow || []
