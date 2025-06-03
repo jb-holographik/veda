@@ -93,77 +93,93 @@ if (highlights.length > 0) {
 const defiInner = document.querySelector('.defi-inner')
 const sectionDefi = document.querySelector('.section_defi')
 const defiLottie = document.querySelector('.section_defi .selector-animation')
+let defiLottieInstance = null
+
+// Fonction pour récupérer l'instance Lottie
+const getLottieInstance = () => {
+  try {
+    if (window.Webflow && window.Webflow.require) {
+      const lottieInstances =
+        window.Webflow.require('lottie').lottie.getRegisteredAnimations()
+
+      const instance = lottieInstances.find((animation) => {
+        return animation.wrapper === defiLottie
+      })
+
+      if (instance) {
+        return instance
+      }
+      return null
+    }
+  } catch {
+    return null
+  }
+  return null
+}
+
+// Fonction pour initialiser et jouer le Lottie
+function initAndPlayLottie() {
+  if (!defiLottieInstance) {
+    defiLottieInstance = getLottieInstance()
+  }
+
+  if (defiLottieInstance) {
+    defiLottieInstance.goToAndStop(0, true)
+    defiLottieInstance.removeEventListener('enterFrame')
+
+    defiLottieInstance.addEventListener('enterFrame', (e) => {
+      const frame = e.currentTime
+      const totalFrames = defiLottieInstance.totalFrames
+      const progress = frame / totalFrames
+
+      if (progress >= 0.8 && !window.overlayAnimationStarted) {
+        window.overlayAnimationStarted = true
+
+        // Créer une timeline pour gérer la séquence complète
+        const tl = gsap.timeline()
+
+        // Entrée de l'overlay
+        tl.to('.selector-overlay', {
+          x: '0%',
+          duration: 1,
+          ease: 'power2.inOut',
+        })
+          // Animation du CTA
+          .add(() => {
+            playCTAAnimation()
+          })
+          // Fade out de l'overlay sur place
+          .to('.selector-overlay', {
+            opacity: 0,
+            duration: 0.5,
+            delay: 1.5, // Augmenté à 1.5s pour laisser le CTA visible plus longtemps
+          })
+          // Repositionnement instantané sans transition
+          .set('.selector-overlay', {
+            x: '100%',
+          })
+          // Restauration de l'opacité
+          .set('.selector-overlay', {
+            opacity: 1,
+          })
+          // Reset des flags et relance de la séquence
+          .add(() => {
+            window.overlayAnimationStarted = false
+            ctaAnimationPlayed = false
+            initAndPlayLottie()
+          })
+      }
+    })
+
+    defiLottieInstance.play()
+  }
+}
 
 if (defiInner && sectionDefi && defiLottie) {
-  // Mettre le lottie en pause au démarrage
-  let defiLottieInstance = null
-
   // Initialiser la position de l'overlay
   const overlay = document.querySelector('.selector-overlay')
   if (overlay) {
     gsap.set(overlay, { x: '100%' })
-  }
-
-  // Fonction pour récupérer l'instance Lottie
-  const getLottieInstance = () => {
-    try {
-      if (window.Webflow && window.Webflow.require) {
-        const lottieInstances =
-          window.Webflow.require('lottie').lottie.getRegisteredAnimations()
-
-        const instance = lottieInstances.find((animation) => {
-          return animation.wrapper === defiLottie
-        })
-
-        if (instance) {
-          return instance
-        }
-        return null
-      }
-    } catch {
-      return null
-    }
-    return null
-  }
-
-  // Fonction pour initialiser et jouer le Lottie
-  const initAndPlayLottie = () => {
-    // Réessayer de récupérer l'instance si elle n'a pas été trouvée avant
-    if (!defiLottieInstance) {
-      defiLottieInstance = getLottieInstance()
-    }
-
-    if (defiLottieInstance) {
-      // Remettre le Lottie au début avant de le lancer
-      defiLottieInstance.goToAndStop(0, true)
-
-      // Supprimer l'ancien listener s'il existe
-      defiLottieInstance.removeEventListener('enterFrame')
-
-      // Écouter la progression du Lottie pour déclencher l'overlay avant la fin
-      defiLottieInstance.addEventListener('enterFrame', (e) => {
-        const frame = e.currentTime
-        const totalFrames = defiLottieInstance.totalFrames
-        const progress = frame / totalFrames
-
-        // Déclencher l'overlay à 80% de l'animation Lottie
-        if (progress >= 0.8 && !window.overlayAnimationStarted) {
-          window.overlayAnimationStarted = true
-          gsap.to('.selector-overlay', {
-            x: '0%',
-            duration: 1,
-            ease: 'power2.inOut',
-            onComplete: () => {
-              window.overlayAnimationStarted = false
-              // Déclencher l'animation du CTA après l'overlay
-              playCTAAnimation()
-            },
-          })
-        }
-      })
-
-      defiLottieInstance.play()
-    }
   }
 
   // ScrollTrigger pour lancer le lottie à 20% du viewport

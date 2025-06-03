@@ -32,6 +32,19 @@ document.addEventListener(
   { once: true }
 )
 
+window.addEventListener('DOMContentLoaded', function () {
+  const bannerWrapper = document.querySelector('.announcement-bar')
+  const items = bannerWrapper?.querySelectorAll('.w-dyn-item')
+
+  if (!bannerWrapper) return
+
+  if (items && items.length > 0) {
+    bannerWrapper.style.display = 'flex'
+  } else {
+    bannerWrapper.style.display = 'none'
+  }
+})
+
 import { fetchAndDisplayTVL } from './utils/data.js'
 fetchAndDisplayTVL()
 
