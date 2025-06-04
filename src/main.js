@@ -1,6 +1,5 @@
 import './styles/style.css'
 import './animations/hero.js'
-// import './animations/slider.js'
 import './animations/marquee.js'
 import './animations/animations.js'
 import './animations/widgets.js'
@@ -32,6 +31,7 @@ document.addEventListener(
   { once: true }
 )
 
+//announcement bar
 window.addEventListener('DOMContentLoaded', function () {
   const bannerWrapper = document.querySelector('.announcement-bar')
   const items = bannerWrapper?.querySelectorAll('.w-dyn-item')
