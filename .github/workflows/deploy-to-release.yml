@@ -32,17 +32,17 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Créer une branche orpheline 'release' (pas liée à main)
-          git checkout --orphan release
+          # Sauvegarder le dossier dist
+          mv dist ../dist-temp
 
-          # Nettoyer tous les fichiers du repo
+          # Passer sur une branche orpheline "release"
+          git checkout --orphan release
           git reset --hard
           git clean -fdx
 
-          # Copier les fichiers buildés depuis dist/
-          cp -r dist/* .
+          # Récupérer le build
+          mv ../dist-temp/* .
 
-          # Commit et push sur la branche release
           git add .
           git commit -m "Deploy build to release branch"
           git push --force origin release
