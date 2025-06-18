@@ -40,6 +40,12 @@ window.addEventListener('DOMContentLoaded', () => {
     return
   }
 
+  // Calculer le padding du hero basé sur la hauteur de la nav
+  setHeroPaddingFromNav()
+
+  // Gérer l'affichage du hero right sur mobile
+  handleHeroRightOnMobile()
+
   const videos = Array.from(document.querySelectorAll('video.swiper-video'))
   const MAX_CONCURRENT_LOADS = 3
   let concurrentLoads = 0
@@ -207,6 +213,12 @@ window.addEventListener('resize', () => {
       return
     }
 
+    // Recalculer le padding du hero lors des redimensionnements
+    setHeroPaddingFromNav()
+
+    // Gérer l'affichage du hero right lors des redimensionnements
+    handleHeroRightOnMobile()
+
     wasDesktop = isNowDesktop
   }, 300)
 })
@@ -214,6 +226,12 @@ window.addEventListener('resize', () => {
 window.Webflow = window.Webflow || []
 window.Webflow.push(() => {
   disableAllLottieAutoplay()
+
+  // Calculer le padding du hero une fois Webflow initialisé
+  setHeroPaddingFromNav()
+
+  // Gérer l'affichage du hero right une fois Webflow initialisé
+  handleHeroRightOnMobile()
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
@@ -282,4 +300,63 @@ function checkSlidesPosition() {
 function initPositionChecker() {
   disableAllLottieAutoplay()
   checkSlidesPosition()
+}
+
+function setHeroPaddingFromNav() {
+  const nav = document.querySelector('.nav')
+  const heroSection = document.querySelector('.section_hero')
+
+  if (!nav || !heroSection) return
+
+  // Obtenir la hauteur de la nav en pixels
+  const navHeight = nav.offsetHeight
+
+  // Convertir en rem (en assumant que 1rem = 16px par défaut)
+  const rootFontSize =
+    parseFloat(getComputedStyle(document.documentElement).fontSize) || 16
+  const navHeightInRem = navHeight / rootFontSize
+
+  // Appliquer le padding-top à la section hero
+  heroSection.style.paddingTop = `${navHeightInRem}rem`
+}
+
+function handleHeroRightOnMobile() {
+  const heroRight = document.querySelector('.hero-content_right')
+  if (!heroRight) return
+
+  // Détecter uniquement mobile en mode portrait (largeur <= 767px)
+  const isMobilePortrait = window.innerWidth <= 767
+
+  if (isMobilePortrait) {
+    // Cacher l'élément sur mobile portrait uniquement
+    heroRight.style.display = 'none'
+
+    // Désactiver toutes les animations dans hero-content_right
+    const videos = heroRight.querySelectorAll('video')
+    videos.forEach((video) => {
+      video.pause()
+      video.currentTime = 0
+    })
+
+    const lotties = heroRight.querySelectorAll('[data-animation-type="lottie"]')
+    lotties.forEach((lottie) => {
+      lottie.setAttribute('data-autoplay', '0')
+      lottie.setAttribute('data-is-ix2-target', '0')
+      lottie.setAttribute('data-autoplay-on-scroll', '0')
+
+      if (window.Webflow && window.Webflow.require) {
+        const lottieInstance = window.Webflow.require('lottie')
+          .lottie.getRegisteredAnimations()
+          .find((animation) => animation.wrapper === lottie)
+
+        if (lottieInstance) {
+          lottieInstance.pause()
+          lottieInstance.goToAndStop(0)
+        }
+      }
+    })
+  } else {
+    // Réafficher l'élément sur tablette et desktop
+    heroRight.style.display = ''
+  }
 }

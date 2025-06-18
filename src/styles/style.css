@@ -1,3 +1,25 @@
+.announcement-bar:hover .announcement-label {
+  color: var(--white);
+}
+
+.hero-p {
+  text-wrap: balance;
+}
+
+.nav.is-on-white .nav-link:hover {
+  color: var(--purple);
+}
+
+.nav.is-on-white .is-button {
+  border-style: solid;
+  border-color: var(--purple);
+}
+
+.nav.is-on-white .is-button:hover {
+  color: var(--white);
+  background-color: var(--purple);
+}
+
 .testimonial,
 .testimonials_heading {
   opacity: 0.5;
@@ -134,7 +156,7 @@
 }
 
 .is-marquee-slide.is-active {
-  border: 1px solid var(--purple);
+  border: 1px solid var(--white);
 }
 
 .swiper-video {
@@ -144,6 +166,11 @@
 
 .swiper-video.ready {
   transition: opacity 0.3s ease-in;
+}
+
+.widget-visual,
+.widget-text {
+  transition: opacity 0.5s ease;
 }
 
 @keyframes marqueeTop {
@@ -239,7 +266,7 @@
   }
 
   .slider-overlay {
-    background-image: linear-gradient(-90deg, white, var(--white) 27%, #fff0 103%);
+    background-image: linear-gradient(-90deg, var(--purple), var(--purple) 27%, #fff0 103%);
     width: 20%;
     height: 100%;
     right: auto;
@@ -248,7 +275,7 @@
   }
 
   .slider-overlay.is-bottom {
-    background-image: linear-gradient(90deg, white, var(--white) 27%, #fff0 103%);
+    background-image: linear-gradient(90deg, var(--purple), var(--purple) 27%, #fff0 103%);
     width: 20%;
     height: 100%;
     right: 0;
@@ -260,6 +287,8 @@
     opacity: 1;
   }
 }
+
+
 
 @media screen and (max-width: 767px) {
 
