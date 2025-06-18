@@ -257,3 +257,46 @@ if (highlights.length > 0) {
 //     ctaAnimationPlayed = true
 //   }
 // }
+
+// 1. Sélectionner l'élément ciblé dans le SVG
+// Fonction pour appliquer le lien une fois l'élément trouvé
+function wrapTargetInLink() {
+  const target = document.querySelector(
+    '.selector-animation > svg > g > g:nth-of-type(2)'
+  )
+
+  if (target) {
+    const svgNS = 'http://www.w3.org/2000/svg'
+    const xlinkNS = 'http://www.w3.org/1999/xlink'
+    const link = document.createElementNS(svgNS, 'a')
+
+    link.setAttributeNS(xlinkNS, 'xlink:href', 'https://app.veda.tech/earn')
+    link.setAttribute('target', '_blank')
+    link.style.cursor = 'pointer'
+
+    const parent = target.parentNode
+    parent.replaceChild(link, target)
+    link.appendChild(target)
+
+    console.log('Lien appliqué avec succès.')
+
+    return true // Stoppe l'observation
+  }
+
+  return false // Pas encore présent
+}
+
+// Observateur qui guette les changements DOM
+const observer = new MutationObserver(() => {
+  const done = wrapTargetInLink()
+  if (done) observer.disconnect()
+})
+
+// Cible à observer : le conteneur de l’animation
+const container = document.querySelector('.selector-animation')
+
+if (container) {
+  observer.observe(container, { childList: true, subtree: true })
+} else {
+  console.warn("Le conteneur '.selector-animation' est introuvable.")
+}
