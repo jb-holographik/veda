@@ -90,170 +90,170 @@ if (highlights.length > 0) {
 
 // --- DEFI ANIMATION ---
 
-const defiInner = document.querySelector('.defi-inner')
-const sectionDefi = document.querySelector('.section_defi')
-const defiLottie = document.querySelector('.section_defi .selector-animation')
-let defiLottieInstance = null
+// const defiInner = document.querySelector('.defi-inner')
+// const sectionDefi = document.querySelector('.section_defi')
+// const defiLottie = document.querySelector('.section_defi .selector-animation')
+// let defiLottieInstance = null
 
-// Fonction pour récupérer l'instance Lottie
-const getLottieInstance = () => {
-  try {
-    if (window.Webflow && window.Webflow.require) {
-      const lottieInstances =
-        window.Webflow.require('lottie').lottie.getRegisteredAnimations()
+// // Fonction pour récupérer l'instance Lottie
+// const getLottieInstance = () => {
+//   try {
+//     if (window.Webflow && window.Webflow.require) {
+//       const lottieInstances =
+//         window.Webflow.require('lottie').lottie.getRegisteredAnimations()
 
-      const instance = lottieInstances.find((animation) => {
-        return animation.wrapper === defiLottie
-      })
+//       const instance = lottieInstances.find((animation) => {
+//         return animation.wrapper === defiLottie
+//       })
 
-      if (instance) {
-        return instance
-      }
-      return null
-    }
-  } catch {
-    return null
-  }
-  return null
-}
+//       if (instance) {
+//         return instance
+//       }
+//       return null
+//     }
+//   } catch {
+//     return null
+//   }
+//   return null
+// }
 
-// Fonction pour initialiser et jouer le Lottie
-function initAndPlayLottie() {
-  if (!defiLottieInstance) {
-    defiLottieInstance = getLottieInstance()
-  }
+// // Fonction pour initialiser et jouer le Lottie
+// function initAndPlayLottie() {
+//   if (!defiLottieInstance) {
+//     defiLottieInstance = getLottieInstance()
+//   }
 
-  if (defiLottieInstance) {
-    defiLottieInstance.goToAndStop(0, true)
-    defiLottieInstance.removeEventListener('enterFrame')
+//   if (defiLottieInstance) {
+//     defiLottieInstance.goToAndStop(0, true)
+//     defiLottieInstance.removeEventListener('enterFrame')
 
-    defiLottieInstance.addEventListener('enterFrame', (e) => {
-      const frame = e.currentTime
-      const totalFrames = defiLottieInstance.totalFrames
-      const progress = frame / totalFrames
+//     defiLottieInstance.addEventListener('enterFrame', (e) => {
+//       const frame = e.currentTime
+//       const totalFrames = defiLottieInstance.totalFrames
+//       const progress = frame / totalFrames
 
-      if (progress >= 0.8 && !window.overlayAnimationStarted) {
-        window.overlayAnimationStarted = true
+//       if (progress >= 0.8 && !window.overlayAnimationStarted) {
+//         window.overlayAnimationStarted = true
 
-        // Créer une timeline pour gérer la séquence complète
-        const tl = gsap.timeline()
+//         // Créer une timeline pour gérer la séquence complète
+//         const tl = gsap.timeline()
 
-        // Entrée de l'overlay
-        tl.to('.selector-overlay', {
-          x: '0%',
-          duration: 1,
-          ease: 'power2.inOut',
-        })
-          // Animation du CTA
-          .add(() => {
-            playCTAAnimation()
-          })
-          // Fade out de l'overlay sur place
-          .to('.selector-overlay', {
-            opacity: 0,
-            duration: 0.5,
-            delay: 1.5, // Augmenté à 1.5s pour laisser le CTA visible plus longtemps
-          })
-          // Repositionnement instantané sans transition
-          .set('.selector-overlay', {
-            x: '100%',
-          })
-          // Restauration de l'opacité
-          .set('.selector-overlay', {
-            opacity: 1,
-          })
-          // Reset des flags et relance de la séquence
-          .add(() => {
-            window.overlayAnimationStarted = false
-            ctaAnimationPlayed = false
-            initAndPlayLottie()
-          })
-      }
-    })
+//         // Entrée de l'overlay
+//         tl.to('.selector-overlay', {
+//           x: '0%',
+//           duration: 1,
+//           ease: 'power2.inOut',
+//         })
+//           // Animation du CTA
+//           .add(() => {
+//             playCTAAnimation()
+//           })
+//           // Fade out de l'overlay sur place
+//           .to('.selector-overlay', {
+//             opacity: 0,
+//             duration: 0.5,
+//             delay: 1.5, // Augmenté à 1.5s pour laisser le CTA visible plus longtemps
+//           })
+//           // Repositionnement instantané sans transition
+//           .set('.selector-overlay', {
+//             x: '100%',
+//           })
+//           // Restauration de l'opacité
+//           .set('.selector-overlay', {
+//             opacity: 1,
+//           })
+//           // Reset des flags et relance de la séquence
+//           .add(() => {
+//             window.overlayAnimationStarted = false
+//             ctaAnimationPlayed = false
+//             initAndPlayLottie()
+//           })
+//       }
+//     })
 
-    defiLottieInstance.play()
-  }
-}
+//     defiLottieInstance.play()
+//   }
+// }
 
-if (defiInner && sectionDefi && defiLottie) {
-  // Initialiser la position de l'overlay
-  const overlay = document.querySelector('.selector-overlay')
-  if (overlay) {
-    gsap.set(overlay, { x: '100%' })
-  }
+// if (defiInner && sectionDefi && defiLottie) {
+//   // Initialiser la position de l'overlay
+//   const overlay = document.querySelector('.selector-overlay')
+//   if (overlay) {
+//     gsap.set(overlay, { x: '100%' })
+//   }
 
-  // ScrollTrigger pour lancer le lottie à 20% du viewport
-  ScrollTrigger.create({
-    trigger: sectionDefi,
-    start: 'top 40%',
-    end: 'bottom top',
-    toggleClass: 'is-visible',
-    toggleActions: 'restart none none reset',
-    onRefresh: (self) => {
-      if (self.isActive) {
-        initAndPlayLottie()
-      }
-    },
-    onToggle: (self) => {
-      if (self.isActive) {
-        initAndPlayLottie()
-      } else {
-        // Réinitialisation complète quand la section sort du viewport
-        if (defiLottieInstance) {
-          defiLottieInstance.stop()
-          defiLottieInstance.goToAndStop(0, true)
-          defiLottieInstance.removeEventListener('enterFrame')
-        }
-        gsap.set('.selector-overlay', { x: '100%' })
-        window.overlayAnimationStarted = false
-        ctaAnimationPlayed = false
-      }
-    },
-  })
-}
+//   // ScrollTrigger pour lancer le lottie à 20% du viewport
+//   ScrollTrigger.create({
+//     trigger: sectionDefi,
+//     start: 'top 40%',
+//     end: 'bottom top',
+//     toggleClass: 'is-visible',
+//     toggleActions: 'restart none none reset',
+//     onRefresh: (self) => {
+//       if (self.isActive) {
+//         initAndPlayLottie()
+//       }
+//     },
+//     onToggle: (self) => {
+//       if (self.isActive) {
+//         initAndPlayLottie()
+//       } else {
+//         // Réinitialisation complète quand la section sort du viewport
+//         if (defiLottieInstance) {
+//           defiLottieInstance.stop()
+//           defiLottieInstance.goToAndStop(0, true)
+//           defiLottieInstance.removeEventListener('enterFrame')
+//         }
+//         gsap.set('.selector-overlay', { x: '100%' })
+//         window.overlayAnimationStarted = false
+//         ctaAnimationPlayed = false
+//       }
+//     },
+//   })
+// }
 
-// --- CTA ANIMATION ---
+// // --- CTA ANIMATION ---
 
-const cta = document.querySelector('.cta.is-animated')
-let ctaAnimationPlayed = false
+// const cta = document.querySelector('.cta.is-animated')
+// let ctaAnimationPlayed = false
 
-function playCTAAnimation() {
-  if (cta && !ctaAnimationPlayed) {
-    const shadow = cta.querySelector('.cta-shadow')
-    gsap.set(shadow, { opacity: 0, width: 0 })
+// function playCTAAnimation() {
+//   if (cta && !ctaAnimationPlayed) {
+//     const shadow = cta.querySelector('.cta-shadow')
+//     gsap.set(shadow, { opacity: 0, width: 0 })
 
-    const tl = gsap.timeline()
+//     const tl = gsap.timeline()
 
-    tl.to(cta, {
-      scale: 0.8,
-      duration: 0.2,
-      ease: 'power1.out',
-    })
-      .to(shadow, {
-        opacity: 0.4,
-        duration: 0.01,
-      })
-      .to(
-        cta,
-        {
-          scale: 1,
-          duration: 0.4,
-          ease: 'power2.out',
-        },
-        '>'
-      )
-      .to(
-        shadow,
-        {
-          width: '100%',
-          opacity: 0,
-          duration: 0.4,
-          ease: 'power2.out',
-        },
-        '<'
-      )
-      .set(shadow, { width: 0 })
+//     tl.to(cta, {
+//       scale: 0.8,
+//       duration: 0.2,
+//       ease: 'power1.out',
+//     })
+//       .to(shadow, {
+//         opacity: 0.4,
+//         duration: 0.01,
+//       })
+//       .to(
+//         cta,
+//         {
+//           scale: 1,
+//           duration: 0.4,
+//           ease: 'power2.out',
+//         },
+//         '>'
+//       )
+//       .to(
+//         shadow,
+//         {
+//           width: '100%',
+//           opacity: 0,
+//           duration: 0.4,
+//           ease: 'power2.out',
+//         },
+//         '<'
+//       )
+//       .set(shadow, { width: 0 })
 
-    ctaAnimationPlayed = true
-  }
-}
+//     ctaAnimationPlayed = true
+//   }
+// }
