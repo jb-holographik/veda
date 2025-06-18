@@ -32,14 +32,17 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Copy dist contents to a temp dir
-          mkdir ../release-temp
-          cp -r dist/* ../release-temp/
-          cd ../release-temp
+          # Créer une branche orpheline 'release' (pas liée à main)
+          git checkout --orphan release
 
-          # Init new Git repo for release
-          git init
-          git checkout -b release
+          # Nettoyer tous les fichiers du repo
+          git reset --hard
+          git clean -fdx
+
+          # Copier les fichiers buildés depuis dist/
+          cp -r dist/* .
+
+          # Commit et push sur la branche release
           git add .
           git commit -m "Deploy build to release branch"
-          git push --force "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" release
+          git push --force origin release
