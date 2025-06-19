@@ -12,10 +12,36 @@ let isAnimating = false
 document.addEventListener('DOMContentLoaded', () => {
   const burger = document.querySelector('.navbar_burger')
   const navMenu = document.querySelector('.nav-menu')
+  const button = document.querySelector('.is-button')
+  const logo = document.querySelector('.veda_logo')
+
+  function toggleMenuStyles(isOpen) {
+    if (button) {
+      if (isOpen) {
+        button.style.backgroundColor = 'var(--purple)'
+        button.style.color = 'var(--white)'
+      } else {
+        button.style.backgroundColor = ''
+        button.style.color = ''
+      }
+    }
+
+    if (logo) {
+      if (isOpen) {
+        logo.style.color = 'var(--purple)'
+      } else {
+        logo.style.color = ''
+      }
+    }
+  }
 
   burger.addEventListener('click', () => {
     burger.classList.toggle('is-active')
     navMenu.classList.toggle('is-open')
+
+    // Vérifier si le menu est ouvert et appliquer les styles correspondants
+    const isMenuOpen = burger.classList.contains('is-active')
+    toggleMenuStyles(isMenuOpen)
   })
 })
 
